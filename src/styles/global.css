@@ -1,0 +1,21 @@
+@import "./tokens.css";
+@import "./reset.css";
+
+html {
+    background: var(--color-bg);
+}
+
+body {
+    min-width: 320px;
+    min-height: 100vh;
+    background: var(--color-bg);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+}
+
+#root {
+    min-height: 100vh;
+}
