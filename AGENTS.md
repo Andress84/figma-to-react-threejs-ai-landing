@@ -58,6 +58,27 @@ src/
 - Respect prefers-reduced-motion.
 - Decorative elements must not pollute accessibility semantics.
 
+## Component Abstraction Rules
+
+Do not create React components for repeated numeric spacing alone.
+Repeated spacing, typography, colors, radii and visual values belong in design tokens/CSS.
+
+Create a reusable React component when there is repeated structure,
+behavior, semantics, or interaction.
+
+Do not create one generic Card component for unrelated section-specific
+cards merely because they share borders, backgrounds or border radii.
+
+Prefer:
+- shared visual rules -> design tokens / CSS
+- shared layout rules -> layout primitives
+- shared structure or behavior -> React components
+- unique section concepts -> section-specific components
+
+Avoid abstraction for its own sake.
+
+Do not create wrapper components that only forward children and className unless they enforce a meaningful shared layout or semantic rule.
+
 ## Animation
 
 Use Three.js / React Three Fiber for WebGL effects:
