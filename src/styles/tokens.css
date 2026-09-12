@@ -1,34 +1,124 @@
+/* Visual values sampled or estimated from raster references are provisional.
+   Validate colors, typography, and layout against the source design when available. */
 :root {
-    /* Colors */
-    --color-bg: #050505;
-    --color-bg-elevated: #151515;
-    --color-surface: #1b1b1d;
+    /* Colors and surfaces. */
+    --color-bg: #010101;
+    --color-bg-elevated: #111111;
+    --color-surface: #1b1b1c;
+    --color-surface-subtle: #171819;
+    --color-surface-overlay: rgb(255 255 255 / 6%);
 
-    --color-text-primary: #ffffff;
-    --color-text-secondary: #a6a6ad;
-    --color-text-muted: #71717a;
-
-    --color-primary: #8b3dff;
+    --color-primary: #8a41ff;
     --color-primary-light: #a867ff;
+    --color-primary-hover: #7d38ec;
+    --color-primary-active: #7030d1;
+    --color-primary-subtle: rgb(138 65 255 / 14%);
     --color-accent-blue: #1778ff;
     --color-accent-orange: #ff5a1f;
 
+    --color-text-primary: #ffffff;
+    --color-text-secondary: #bababa;
+    /* Keep small, muted copy readable on the charcoal surfaces. */
+    --color-text-muted: #929296;
+    --color-text-accent: var(--color-primary-light);
+    --color-text-on-primary: var(--color-text-primary);
+
+    /* Subtle dividers, outlined controls, and purple highlighted borders. */
+    --border-width: 1px;
+    --border-width-emphasis: 2px;
     --color-border: rgb(255 255 255 / 10%);
+    --color-border-strong: rgb(255 255 255 / 24%);
+    --color-border-accent: var(--color-primary);
+    --color-border-hover: rgb(195 163 255 / 55%);
+    --border-subtle: var(--border-width) solid var(--color-border);
+    --border-strong: var(--border-width) solid var(--color-border-strong);
 
-    /* Layout */
-    --container-width: 1200px;
-    --container-padding: 24px;
+    /* Corner and pill radii estimated from reference shapes. */
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1.25rem;
+    --radius-xl: 2rem;
+    --radius-full: 999px;
 
-    /* Typography */
+    /* Shared spacing uses a 4px base; components own their layout rules. */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+    --space-16: 4rem;
+    --space-20: 5rem;
+    --space-24: 6rem;
+    --space-32: 8rem;
+
+    /* Provisional content widths exclude the responsive gutters. */
+    --container-width: 75rem;
+    --container-width-narrow: 56rem;
+    --container-padding: var(--space-5);
+    --section-space: clamp(4rem, 2rem + 8vw, 8rem);
+    --section-header-gap: var(--space-6);
+    --section-content-gap: clamp(2rem, 1rem + 4vw, 5rem);
+    --measure-heading: 24ch;
+    --measure-copy: 50rem;
+    --control-min-height: 3rem;
+
+    /* No font asset is bundled yet; retain the existing Inter/system stack. */
     --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
+        sans-serif;
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-heading: clamp(1.75rem, 1.1rem + 2.67vw, 3.5rem);
+    --font-size-display: clamp(2.25rem, 1.25rem + 4vw, 4.5rem);
+    --font-size-stat: clamp(2.5rem, 1.75rem + 3vw, 4.5rem);
+    --font-size-lead: clamp(0.875rem, 0.78rem + 0.4vw, 1.125rem);
+    --font-size-button: clamp(1rem, 0.9rem + 0.4vw, 1.25rem);
+    --line-height-heading: 1.2;
+    --line-height-copy: 1.5;
+    --line-height-control: 1.25;
+    --letter-spacing-heading: -0.02em;
 
-    /* Radius */
-    --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 20px;
+    /* Offset keeps keyboard focus distinct from a control's own border. */
+    --focus-ring-color: #c3a3ff;
+    --focus-ring-width: 2px;
+    --focus-ring-offset: 3px;
+    --focus-ring: var(--focus-ring-width) solid var(--focus-ring-color);
+    --color-selection-bg: var(--color-primary);
+    --color-selection-text: var(--color-text-on-primary);
 
-    /* Transitions */
-    --transition-fast: 180ms ease;
-    --transition-base: 300ms ease;
+    /* Interaction defaults; section animation is implemented separately. */
+    --duration-fast: 180ms;
+    --duration-base: 300ms;
+    --duration-slow: 500ms;
+    --ease-standard: ease;
+    --ease-out: cubic-bezier(0.2, 0.7, 0.3, 1);
+    --transition-fast: var(--duration-fast) var(--ease-standard);
+    --transition-base: var(--duration-base) var(--ease-standard);
+}
+
+/* Provisional tablet breakpoint and gutters estimated from the raster layout.
+   Media queries need literal breakpoints; custom properties cannot be used. */
+@media (min-width: 48rem) {
+    :root {
+        --container-padding: var(--space-10);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --duration-fast: 0ms;
+        --duration-base: 0ms;
+        --duration-slow: 0ms;
+    }
 }

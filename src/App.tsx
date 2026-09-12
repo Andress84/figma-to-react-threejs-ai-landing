@@ -1,8 +1,12 @@
+import { Container } from './components/ui/Container'
+
 function App() {
   return (
-      <main>
+    <main id="main-content">
+      <Container>
         <h1>AI SaaS Landing Page</h1>
-      </main>
+      </Container>
+    </main>
   )
 }
 

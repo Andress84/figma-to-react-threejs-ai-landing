@@ -1,0 +1,39 @@
+.sectionHeader {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-header-gap);
+}
+
+.start {
+    align-items: flex-start;
+    text-align: start;
+}
+
+.center {
+    align-items: center;
+    text-align: center;
+}
+
+.title {
+    max-width: var(--measure-heading);
+    margin: 0;
+    color: var(--color-text-primary);
+    font-size: var(--font-size-heading);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-heading);
+    letter-spacing: var(--letter-spacing-heading);
+    overflow-wrap: anywhere;
+}
+
+.center .title {
+    text-wrap: balance;
+}
+
+.description {
+    max-width: var(--measure-copy);
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-lead);
+    line-height: var(--line-height-copy);
+    overflow-wrap: anywhere;
+}
