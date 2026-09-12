@@ -1,12 +1,19 @@
-import { Container } from './components/ui/Container'
+import { HeroMetricStrip } from './components/sections/HeroMetricStrip'
+import { HeroSection } from './components/sections/HeroSection'
+import { SiteHeader } from './components/sections/SiteHeader'
+import styles from './App.module.css'
 
 function App() {
   return (
-    <main id="main-content">
-      <Container>
-        <h1>AI SaaS Landing Page</h1>
-      </Container>
-    </main>
+    <>
+      <SiteHeader />
+      <main id="main-content" tabIndex={-1}>
+        <div className={styles.firstScreen}>
+          <HeroSection />
+          <HeroMetricStrip />
+        </div>
+      </main>
+    </>
   )
 }
 

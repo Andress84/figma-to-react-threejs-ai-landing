@@ -1,0 +1,237 @@
+.hero {
+    position: relative;
+    isolation: isolate;
+    padding-block: var(--space-12) var(--space-8);
+}
+
+/* Static lighting only. The clipped gradient layer can later host the WebGL effect. */
+.backdrop {
+    position: absolute;
+    z-index: -1;
+    inset: calc(-1 * var(--site-header-height)) 0 0;
+    overflow: hidden;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse at 110% 70%, var(--color-hero-warm-glow), transparent 35%),
+        radial-gradient(ellipse at 65% 64%, var(--color-hero-blue-glow), transparent 65%),
+        var(--color-bg);
+}
+
+.backdrop::before,
+.backdrop::after {
+    position: absolute;
+    width: 140%;
+    height: 95%;
+    border: var(--border-width) solid var(--color-hero-light-edge);
+    border-radius: 50%;
+    box-shadow:
+        0 0 3rem var(--color-hero-blue-glow),
+        inset 0 0 3rem var(--color-hero-blue-glow);
+    content: '';
+}
+
+.backdrop::before {
+    top: -12%;
+    left: -55%;
+    transform: rotate(-28deg);
+}
+
+.backdrop::after {
+    top: -4%;
+    right: -80%;
+    transform: rotate(-42deg);
+    border-color: var(--color-hero-warm-glow);
+    box-shadow: 0 0 3rem var(--color-hero-warm-glow);
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.socialProof {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--control-min-height);
+    padding: var(--space-1) var(--space-4);
+    border: var(--border-subtle);
+    border-radius: var(--radius-full);
+    background: var(--color-surface-overlay);
+    font-size: var(--font-size-xs);
+    white-space: nowrap;
+}
+
+.avatars {
+    display: flex;
+    flex: 0 0 auto;
+    padding-right: var(--space-1);
+}
+
+.avatars svg {
+    width: var(--space-8);
+    height: var(--space-8);
+    margin-right: calc(-1 * var(--space-3));
+    overflow: hidden;
+    border: var(--border-width-emphasis) solid var(--color-bg);
+    border-radius: var(--radius-full);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+}
+
+.avatars svg:nth-child(even) {
+    background: var(--color-text-muted);
+    color: var(--color-surface);
+}
+
+.avatars svg:last-child {
+    margin-right: 0;
+}
+
+.heading {
+    max-width: 100%;
+    margin-top: var(--space-10);
+    font-size: var(--font-size-display);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-heading);
+    letter-spacing: var(--letter-spacing-heading);
+}
+
+.accent {
+    background: linear-gradient(110deg, var(--color-primary), var(--color-primary-light));
+    background-clip: text;
+    color: transparent;
+}
+
+.wideBreak {
+    display: none;
+}
+
+.description {
+    max-width: 36rem;
+    margin-top: var(--space-12);
+    color: var(--color-text-secondary);
+    font-size: clamp(0.875rem, 3.85vw, 1rem);
+    line-height: 1.45;
+}
+
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    width: 100%;
+    margin-top: var(--space-10);
+}
+
+.action {
+    min-height: var(--hero-action-height);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+}
+
+@media (min-width: 48rem) {
+    .hero {
+        padding-block: var(--space-20) var(--space-32);
+    }
+
+    .backdrop {
+        background:
+            radial-gradient(ellipse at -15% 82%, var(--color-hero-warm-glow), transparent 35%),
+            radial-gradient(ellipse at 115% 74%, var(--color-hero-warm-glow), transparent 35%),
+            radial-gradient(ellipse at 50% 66%, var(--color-hero-blue-glow), transparent 65%),
+            var(--color-bg);
+    }
+
+    .backdrop::before {
+        top: -45%;
+        left: -20%;
+        transform: none;
+    }
+
+    .backdrop::after {
+        top: 40%;
+        right: -105%;
+    }
+
+    .socialProof {
+        gap: var(--space-4);
+        min-height: 3.25rem;
+        padding: var(--space-2) var(--space-5);
+        font-size: var(--font-size-sm);
+    }
+
+    .heading {
+        margin-top: var(--space-8);
+    }
+
+    .mobileBreak {
+        display: none;
+    }
+
+    .wideBreak {
+        display: inline;
+    }
+
+    .description {
+        max-width: 34rem;
+        margin-top: var(--space-8);
+        font-size: var(--font-size-lg);
+        line-height: var(--line-height-copy);
+    }
+
+    .actions {
+        flex-direction: row;
+        justify-content: center;
+        gap: var(--space-4);
+        margin-top: var(--space-8);
+    }
+
+    .action {
+        padding-inline: var(--space-6);
+    }
+}
+
+@media (min-width: 75rem) {
+    .hero {
+        display: flex;
+        flex: 1 0 auto;
+        align-items: center;
+        padding-block: var(--space-10);
+    }
+
+    .socialProof {
+        display: none;
+    }
+
+    .heading {
+        margin-top: 0;
+        line-height: 1.15;
+    }
+
+    .description {
+        max-width: 44rem;
+        margin-top: var(--space-10);
+        font-size: var(--font-size-xl);
+    }
+
+    .actions {
+        gap: var(--space-6);
+        margin-top: var(--space-10);
+    }
+
+    .action {
+        padding-block: var(--space-2);
+        padding-inline: var(--space-8);
+        font-size: var(--font-size-xl);
+        font-weight: var(--font-weight-regular);
+    }
+}
+
+@media (forced-colors: active) {
+    .accent {
+        background: none;
+        color: CanvasText;
+    }
+}

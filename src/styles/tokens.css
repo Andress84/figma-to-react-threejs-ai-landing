@@ -16,6 +16,11 @@
     --color-accent-blue: #1778ff;
     --color-accent-orange: #ff5a1f;
 
+    /* Low-contrast, static hero lighting; no image or WebGL dependency. */
+    --color-hero-blue-glow: rgb(0 76 140 / 20%);
+    --color-hero-warm-glow: rgb(164 53 25 / 14%);
+    --color-hero-light-edge: rgb(20 109 169 / 12%);
+
     --color-text-primary: #ffffff;
     --color-text-secondary: #bababa;
     /* Keep small, muted copy readable on the charcoal surfaces. */
@@ -65,6 +70,8 @@
     --measure-heading: 24ch;
     --measure-copy: 50rem;
     --control-min-height: 3rem;
+    --site-header-height: 4rem;
+    --hero-action-height: 3.25rem;
 
     /* No font asset is bundled yet; retain the existing Inter/system stack. */
     --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -80,7 +87,9 @@
     --font-size-xl: 1.25rem;
     --font-size-2xl: 1.5rem;
     --font-size-heading: clamp(1.75rem, 1.1rem + 2.67vw, 3.5rem);
-    --font-size-display: clamp(2.25rem, 1.25rem + 4vw, 4.5rem);
+    --font-size-display: clamp(1.875rem, 9.75vw, 3.5rem);
+    --font-size-nav-desktop: 1.375rem;
+    --font-size-hero-metric: 3rem;
     --font-size-stat: clamp(2.5rem, 1.75rem + 3vw, 4.5rem);
     --font-size-lead: clamp(0.875rem, 0.78rem + 0.4vw, 1.125rem);
     --font-size-button: clamp(1rem, 0.9rem + 0.4vw, 1.25rem);
@@ -107,11 +116,23 @@
     --transition-base: var(--duration-base) var(--ease-standard);
 }
 
-/* Provisional tablet breakpoint and gutters estimated from the raster layout.
+/* Tablet composition and gutters measured against the 768px raster layout.
    Media queries need literal breakpoints; custom properties cannot be used. */
 @media (min-width: 48rem) {
     :root {
         --container-padding: var(--space-10);
+        --site-header-height: 8.5rem;
+        --hero-action-height: 3rem;
+        --font-size-display: clamp(3.5rem, 6vw, 4rem);
+    }
+}
+
+/* Full desktop composition: the social pill gives way to the metric strip. */
+@media (min-width: 75rem) {
+    :root {
+        --site-header-height: 9.375rem;
+        --hero-action-height: 3.125rem;
+        --font-size-display: clamp(4rem, 5.28vw, 4.75rem);
     }
 }
 

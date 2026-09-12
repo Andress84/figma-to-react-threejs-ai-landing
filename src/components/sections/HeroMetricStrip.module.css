@@ -1,0 +1,48 @@
+.strip {
+    display: none;
+}
+
+@media (min-width: 75rem) {
+    .strip {
+        display: block;
+        padding-block: var(--space-10);
+        border: var(--border-subtle);
+    }
+
+    .container {
+        --container-width: 90rem;
+        --container-padding: 0rem;
+    }
+
+    .metrics {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        margin: 0;
+    }
+
+    .metric {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-3);
+        min-height: 8.25rem;
+        padding-inline: var(--space-6);
+        text-align: center;
+    }
+
+    .metric + .metric {
+        border-left: var(--border-subtle);
+    }
+
+    .metric dt {
+        color: var(--color-text-accent);
+        font-size: var(--font-size-nav-desktop);
+    }
+
+    .metric dd {
+        margin: 0;
+        font-size: var(--font-size-hero-metric);
+        line-height: var(--line-height-control);
+    }
+}

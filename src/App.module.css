@@ -1,0 +1,8 @@
+@media (min-width: 75rem) {
+    .firstScreen {
+        display: flex;
+        flex-direction: column;
+        min-height: calc(100vh - var(--site-header-height));
+        min-height: calc(100dvh - var(--site-header-height));
+    }
+}
