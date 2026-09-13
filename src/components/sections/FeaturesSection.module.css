@@ -1,0 +1,126 @@
+.section {
+    position: relative;
+    overflow: hidden;
+    padding-block: var(--space-16) var(--space-32);
+    background:
+        radial-gradient(circle at 100% 100%, var(--color-primary-subtle), transparent 32rem),
+        var(--color-bg);
+}
+
+.intro {
+    display: grid;
+}
+
+.heading {
+    color: var(--color-text-primary);
+    font-size: var(--font-size-heading);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.12;
+    letter-spacing: var(--letter-spacing-heading);
+}
+
+.heading span {
+    display: block;
+}
+
+.heading strong {
+    color: var(--color-primary);
+    font-weight: inherit;
+}
+
+.description {
+    max-width: 38rem;
+    margin-top: var(--space-5);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-copy);
+}
+
+.artwork {
+    display: none;
+}
+
+.grid {
+    display: grid;
+    gap: var(--space-4);
+    margin-top: var(--space-8);
+}
+
+@media (max-width: 22.5rem) {
+    .heading {
+        font-size: var(--font-size-2xl);
+    }
+}
+
+@media (min-width: 48rem) {
+    .section {
+        padding-block: var(--space-16) var(--space-24);
+    }
+
+    .description {
+        max-width: 42rem;
+        margin-top: var(--space-6);
+        font-size: var(--font-size-sm);
+    }
+
+    .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        margin-top: var(--space-12);
+    }
+}
+
+@media (min-width: 75rem) {
+    .section {
+        padding-block: var(--space-32);
+        background: var(--color-bg);
+    }
+
+    .intro {
+        grid-template-columns: minmax(0, 4fr) minmax(10rem, 1fr);
+        align-items: center;
+        gap: var(--space-12);
+    }
+
+    .description {
+        max-width: 48rem;
+        font-size: var(--font-size-base);
+    }
+
+    .artwork {
+        display: block;
+        width: 11.25rem;
+        color: var(--color-text-secondary);
+        justify-self: center;
+        transform: rotate(5deg);
+        opacity: 0.7;
+    }
+
+    .grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: var(--space-6);
+        margin-top: var(--space-20);
+    }
+
+    .grid > :nth-child(1),
+    .grid > :nth-child(4) {
+        --feature-card-accent:
+            radial-gradient(
+                circle at 100% 100%,
+                color-mix(in srgb, var(--color-primary) 42%, transparent),
+                transparent 70%
+            );
+
+        grid-column: span 2;
+    }
+
+    .grid > :nth-child(2),
+    .grid > :nth-child(3) {
+        grid-column: span 3;
+    }
+}
+
+@media (forced-colors: active) {
+    .heading strong {
+        color: CanvasText;
+    }
+}

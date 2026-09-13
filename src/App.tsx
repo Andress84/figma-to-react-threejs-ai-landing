@@ -1,3 +1,4 @@
+import { FeaturesSection } from './components/sections/FeaturesSection'
 import { HeroMetricStrip } from './components/sections/HeroMetricStrip'
 import { HeroSection } from './components/sections/HeroSection'
 import { SiteHeader } from './components/sections/SiteHeader'
@@ -12,6 +13,7 @@ function App() {
           <HeroSection />
           <HeroMetricStrip />
         </div>
+        <FeaturesSection />
       </main>
     </>
   )
