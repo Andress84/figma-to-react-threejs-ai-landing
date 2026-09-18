@@ -1,0 +1,202 @@
+.item {
+    position: relative;
+    min-width: 0;
+}
+
+.value {
+    color: var(--color-text-primary);
+    font-size: clamp(1.875rem, 8.5vw, 2.5rem);
+    font-weight: var(--font-weight-regular);
+    line-height: 1;
+    letter-spacing: var(--letter-spacing-heading);
+}
+
+.title {
+    margin-top: var(--space-4);
+    color: var(--color-primary-light);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-control);
+}
+
+.description {
+    max-width: 16rem;
+    margin-top: var(--space-2);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
+    line-height: 1.45;
+}
+
+.decoration {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-top: var(--space-3);
+}
+
+.people {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    min-height: 1.5rem;
+}
+
+.person {
+    position: relative;
+    display: block;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-left: -0.35rem;
+    overflow: hidden;
+    border: var(--border-width-emphasis) solid var(--color-surface-subtle);
+    border-radius: var(--radius-full);
+    background:
+        radial-gradient(circle at 50% 34%, #d7c8b8 0 17%, transparent 18%),
+        radial-gradient(ellipse at 50% 105%, #77777d 0 45%, transparent 46%),
+        linear-gradient(145deg, #434247, #1f2022);
+}
+
+.person:first-child {
+    margin-left: 0;
+}
+
+.person:nth-child(2) {
+    background:
+        radial-gradient(circle at 50% 34%, #b79780 0 17%, transparent 18%),
+        radial-gradient(ellipse at 50% 105%, #a18b7b 0 45%, transparent 46%),
+        linear-gradient(145deg, #555158, #232326);
+}
+
+.person:nth-child(3) {
+    background:
+        radial-gradient(circle at 50% 34%, #e0ba94 0 17%, transparent 18%),
+        radial-gradient(ellipse at 50% 105%, #626875 0 45%, transparent 46%),
+        linear-gradient(145deg, #5d5c62, #242426);
+}
+
+.person:not(:first-child) {
+    display: none;
+}
+
+.item[data-media='thumbnails'] .person {
+    background:
+        linear-gradient(135deg, transparent 52%, rgb(138 65 255 / 35%) 53%),
+        linear-gradient(145deg, #91887e, #2c2b2d);
+}
+
+.item[data-media='thumbnails'] .person:nth-child(2) {
+    background:
+        radial-gradient(circle at 70% 30%, #d3b18f 0 14%, transparent 15%),
+        linear-gradient(145deg, #3d3d41, #8d7564);
+}
+
+.item[data-media='thumbnails'] .person:nth-child(3) {
+    background:
+        linear-gradient(45deg, rgb(255 255 255 / 14%) 50%, transparent 51%),
+        linear-gradient(145deg, #796c64, #28282c);
+}
+
+.rule {
+    position: relative;
+    display: none;
+    flex: 1 1 auto;
+    height: var(--border-width);
+    margin-left: var(--space-3);
+    background: var(--color-border-strong);
+}
+
+.rule::before,
+.rule::after {
+    position: absolute;
+    right: 0;
+    width: 1.25rem;
+    height: var(--border-width);
+    background: var(--color-border-strong);
+    content: '';
+}
+
+.rule::before {
+    transform: rotate(90deg);
+}
+
+@media (min-width: 48rem) {
+    .value {
+        font-size: 2.5rem;
+    }
+
+    .title {
+        margin-top: var(--space-5);
+        font-size: var(--font-size-base);
+    }
+
+    .description {
+        max-width: 19rem;
+        font-size: var(--font-size-sm);
+    }
+
+    .decoration {
+        margin-top: var(--space-4);
+    }
+}
+
+@media (min-width: 75rem) {
+    .item:nth-child(odd)::after {
+        position: absolute;
+        top: 1.25rem;
+        right: var(--space-3);
+        width: 0.375rem;
+        height: 0.375rem;
+        border-radius: var(--radius-full);
+        background: var(--color-primary);
+        content: '';
+        opacity: 0.72;
+    }
+
+    .value {
+        font-size: var(--font-size-stat);
+    }
+
+    .title {
+        margin-top: var(--space-5);
+        color: var(--color-text-primary);
+        font-size: var(--font-size-lg);
+        font-weight: var(--font-weight-regular);
+    }
+
+    .description {
+        max-width: 17rem;
+        margin-top: var(--space-2);
+        font-size: var(--font-size-xs);
+    }
+
+    .decoration {
+        margin-top: var(--space-5);
+    }
+
+    .people {
+        min-height: 2.25rem;
+    }
+
+    .person {
+        width: 2.25rem;
+        height: 2.25rem;
+        margin-left: -0.5rem;
+    }
+
+    .person:not(:first-child) {
+        display: block;
+    }
+
+    .item[data-media='thumbnails'] .person {
+        width: 2.75rem;
+        border-radius: 0.25rem;
+    }
+
+    .rule {
+        display: block;
+    }
+
+    .rule::before {
+        width: 6.5rem;
+    }
+}

@@ -33,10 +33,10 @@ export function HeroSection() {
         </p>
 
         <div className={styles.actions}>
-          <ButtonLink className={styles.action} href="#get-started">
+          <ButtonLink href="#get-started" size="lg">
             Get Started
           </ButtonLink>
-          <ButtonLink className={styles.action} variant="secondary" href="#product">
+          <ButtonLink variant="secondary" href="#product" size="lg">
             View Features
           </ButtonLink>
         </div>

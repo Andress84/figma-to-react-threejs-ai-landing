@@ -9,6 +9,7 @@ export type ButtonLinkProps = Omit<
   href: string
   children: ReactNode
   variant?: 'primary' | 'secondary'
+  size?: 'md' | 'lg'
   /** Decorative trailing icon; the visible children provide the link label. */
   endIcon?: ReactNode
 }
@@ -18,6 +19,7 @@ export function ButtonLink({
   href,
   children,
   variant = 'primary',
+  size = 'md',
   endIcon,
   className,
   target,
@@ -35,7 +37,7 @@ export function ButtonLink({
       href={href}
       target={target}
       rel={linkRel}
-      className={[styles.buttonLink, styles[variant], className]
+      className={[styles.buttonLink, styles[variant], styles[size], className]
         .filter(Boolean)
         .join(' ')}
     >

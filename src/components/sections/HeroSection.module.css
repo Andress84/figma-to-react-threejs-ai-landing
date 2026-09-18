@@ -125,12 +125,6 @@
     margin-top: var(--space-10);
 }
 
-.action {
-    min-height: var(--hero-action-height);
-    font-size: var(--font-size-base);
-    font-weight: var(--font-weight-semibold);
-}
-
 @media (min-width: 48rem) {
     .hero {
         padding-block: var(--space-20) var(--space-32);
@@ -187,10 +181,6 @@
         gap: var(--space-4);
         margin-top: var(--space-8);
     }
-
-    .action {
-        padding-inline: var(--space-6);
-    }
 }
 
 @media (min-width: 75rem) {
@@ -219,13 +209,6 @@
     .actions {
         gap: var(--space-6);
         margin-top: var(--space-10);
-    }
-
-    .action {
-        padding-block: var(--space-2);
-        padding-inline: var(--space-8);
-        font-size: var(--font-size-xl);
-        font-weight: var(--font-weight-regular);
     }
 }
 

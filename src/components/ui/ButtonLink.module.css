@@ -3,19 +3,29 @@
     align-items: center;
     justify-content: center;
     gap: var(--space-3);
-    min-height: var(--control-min-height);
     max-width: 100%;
-    padding: var(--space-3) var(--space-8);
     border: var(--border-width) solid transparent;
     border-radius: var(--radius-sm);
-    font-size: var(--font-size-button);
-    font-weight: var(--font-weight-semibold);
     line-height: var(--line-height-control);
     text-align: center;
     text-decoration: none;
     transition:
         background-color var(--transition-fast),
         border-color var(--transition-fast);
+}
+
+.md {
+    min-height: var(--control-min-height);
+    padding: var(--space-3) var(--space-8);
+    font-size: var(--font-size-button);
+    font-weight: var(--font-weight-semibold);
+}
+
+.lg {
+    min-height: var(--hero-action-height);
+    padding: var(--space-3) var(--space-8);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
 }
 
 .primary {
@@ -48,9 +58,23 @@
     height: 100%;
 }
 
-/* Provisional desktop label weight and breakpoint inferred from the raster. */
+@media (min-width: 48rem) {
+    .lg {
+        padding-inline: var(--space-6);
+    }
+}
+
 @media (min-width: 64rem) {
-    .buttonLink {
+    .md {
+        font-weight: var(--font-weight-regular);
+    }
+}
+
+@media (min-width: 75rem) {
+    .lg {
+        padding-block: var(--space-2);
+        padding-inline: var(--space-8);
+        font-size: var(--font-size-xl);
         font-weight: var(--font-weight-regular);
     }
 }
