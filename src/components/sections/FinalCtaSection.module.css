@@ -1,0 +1,161 @@
+.section {
+    padding-bottom: var(--space-24);
+    background: var(--color-bg);
+}
+
+.container {
+    padding-inline: 0;
+}
+
+.panel {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    border: var(--border-subtle);
+    border-radius: var(--radius-xl);
+    padding: var(--space-12) var(--space-5);
+    background:
+        radial-gradient(ellipse 80% 65% at 50% -8%, rgb(100 56 191 / 40%), transparent 100%),
+        radial-gradient(ellipse 80% 65% at 50% 0%, rgb(29 58 132 / 17%), transparent 100%),
+        linear-gradient(180deg, rgb(32 29 43 / 92%), rgb(30 30 30 / 98%) 70%);
+    text-align: center;
+}
+
+.heading,
+.description,
+.cta {
+    position: relative;
+    z-index: 1;
+}
+
+.heading {
+    max-width: 23ch;
+    font-size: var(--font-size-heading);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-heading);
+    letter-spacing: var(--letter-spacing-heading);
+    text-wrap: balance;
+}
+
+.description {
+    max-width: 38rem;
+    margin-top: var(--space-6);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-copy);
+    text-wrap: pretty;
+}
+
+.cta {
+    width: 100%;
+    margin-top: var(--space-6);
+}
+
+.cta > span:last-child {
+    display: none;
+}
+
+@media (min-width: 48rem) {
+    .section {
+        padding-bottom: var(--space-24);
+    }
+
+    .panel {
+        min-height: 28rem;
+        justify-content: center;
+        border: 0;
+        border-radius: 0;
+        padding: var(--space-16) var(--space-10);
+        background:
+            radial-gradient(ellipse 70% 68% at 50% 0%, rgb(111 68 190 / 45%), transparent 100%),
+            radial-gradient(ellipse 75% 68% at 25% 5%, rgb(80 35 180 / 32%), transparent 100%),
+            linear-gradient(180deg, rgb(25 17 48 / 95%), var(--color-bg) 76%);
+    }
+
+    .heading {
+        max-width: none;
+        font-size: clamp(2.75rem, 5.7vw, 3.5rem);
+    }
+
+    .heading span {
+        display: block;
+    }
+
+    .description {
+        max-width: 39rem;
+        margin-top: var(--space-10);
+        font-size: var(--font-size-lg);
+    }
+
+    .cta {
+        width: auto;
+        margin-top: var(--space-10);
+    }
+
+    .cta > span:last-child {
+        display: inline-flex;
+    }
+}
+
+@media (min-width: 75rem) {
+    .section {
+        padding-bottom: 9rem;
+    }
+
+    .container {
+        padding-inline: var(--container-padding);
+    }
+
+    .panel {
+        min-height: 0;
+        max-width: 70rem;
+        margin-inline: auto;
+        overflow: visible;
+        border: var(--border-strong);
+        border-radius: var(--radius-xl);
+        padding: var(--space-16) var(--space-10) 0;
+        background:
+            radial-gradient(ellipse 45% 90% at 53% 24%, rgb(100 56 191 / 46%), transparent 100%),
+            radial-gradient(ellipse 50% 72% at 35% 10%, rgb(43 35 135 / 35%), transparent 100%),
+            radial-gradient(ellipse 40% 90% at 100% 35%, rgb(112 35 49 / 28%), transparent 100%),
+            linear-gradient(180deg, rgb(20 19 24 / 88%), rgb(20 20 20 / 94%));
+    }
+
+    .panel::before {
+        position: absolute;
+        z-index: 0;
+        inset: 0;
+        border-radius: inherit;
+        background-image:
+            linear-gradient(to right, rgb(255 255 255 / 3%) 1px, transparent 1px),
+            linear-gradient(to bottom, rgb(255 255 255 / 3%) 1px, transparent 1px);
+        background-size: 2.5rem 2.5rem;
+        content: '';
+        pointer-events: none;
+    }
+
+    .heading {
+        font-size: 3.25rem;
+        line-height: 1.4;
+    }
+
+    .description {
+        max-width: 42rem;
+        margin-top: var(--space-10);
+        font-size: var(--font-size-xl);
+    }
+
+    .cta {
+        margin-top: var(--space-10);
+        margin-bottom: calc(-1 * var(--space-6));
+    }
+}
+
+@media (forced-colors: active) {
+    .panel {
+        border: var(--border-width) solid CanvasText;
+    }
+}

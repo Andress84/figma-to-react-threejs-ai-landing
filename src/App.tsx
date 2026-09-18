@@ -1,5 +1,6 @@
 import { FeaturesSection } from './components/sections/FeaturesSection'
 import { FaqSection } from './components/sections/FaqSection'
+import { FinalCtaSection } from './components/sections/FinalCtaSection'
 import { HeroMetricStrip } from './components/sections/HeroMetricStrip'
 import { HeroSection } from './components/sections/HeroSection'
 import { PricingSection } from './components/sections/PricingSection'
@@ -20,6 +21,7 @@ function App() {
         <ResultsSection />
         <PricingSection />
         <FaqSection />
+        <FinalCtaSection />
       </main>
     </>
   )
