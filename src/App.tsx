@@ -1,6 +1,7 @@
 import { FeaturesSection } from './components/sections/FeaturesSection'
 import { HeroMetricStrip } from './components/sections/HeroMetricStrip'
 import { HeroSection } from './components/sections/HeroSection'
+import { PricingSection } from './components/sections/PricingSection'
 import { ResultsSection } from './components/sections/ResultsSection'
 import { SiteHeader } from './components/sections/SiteHeader'
 import styles from './App.module.css'
@@ -16,6 +17,7 @@ function App() {
         </div>
         <FeaturesSection />
         <ResultsSection />
+        <PricingSection />
       </main>
     </>
   )

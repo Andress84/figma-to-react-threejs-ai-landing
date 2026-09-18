@@ -1,0 +1,252 @@
+.card {
+    min-width: 0;
+    border: var(--border-subtle);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+}
+
+.featured {
+    border: var(--border-width-emphasis) solid transparent;
+    background:
+        linear-gradient(
+            155deg,
+            color-mix(in srgb, var(--color-surface) 92%, var(--color-primary)),
+            var(--color-surface) 42%
+        ) padding-box,
+        linear-gradient(180deg, #8A41FF 0%, #080064 100%) border-box;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    min-height: 25rem;
+    height: 100%;
+    padding: var(--space-6);
+}
+
+.name {
+    color: var(--color-text-primary);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-control);
+}
+
+.featured .name {
+    color: var(--color-primary-light);
+}
+
+.description {
+    min-height: 4.5em;
+    margin-top: var(--space-5);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-copy);
+}
+
+.priceLine {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 var(--space-2);
+    margin-top: var(--space-5);
+    color: var(--color-text-primary);
+}
+
+.price {
+    font-size: clamp(2rem, 7.5vw, 2.75rem);
+    font-weight: var(--font-weight-semibold);
+    line-height: 1.1;
+    letter-spacing: var(--letter-spacing-heading);
+}
+
+.period {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-xs);
+    white-space: nowrap;
+}
+
+.discount {
+    align-self: center;
+    padding: 0.15rem var(--space-2);
+    border-radius: var(--radius-full);
+    background: var(--color-primary);
+    color: var(--color-text-on-primary);
+    font-size: 0.625rem;
+    font-weight: var(--font-weight-semibold);
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.included {
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: var(--border-subtle);
+}
+
+.includedTitle {
+    margin-bottom: var(--space-4);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-control);
+}
+
+.features {
+    display: grid;
+    gap: var(--space-2);
+}
+
+.feature {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    min-width: 0;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-xs);
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+}
+
+.check {
+    position: relative;
+    flex: 0 0 0.9rem;
+    width: 0.9rem;
+    height: 0.9rem;
+    margin-top: 0.12em;
+    border: var(--border-width) solid var(--color-text-muted);
+    border-radius: var(--radius-full);
+}
+
+.check::after {
+    position: absolute;
+    top: 0.13rem;
+    left: 0.26rem;
+    width: 0.25rem;
+    height: 0.42rem;
+    border-right: var(--border-width) solid currentColor;
+    border-bottom: var(--border-width) solid currentColor;
+    color: var(--color-text-secondary);
+    content: '';
+    transform: rotate(45deg);
+}
+
+.featured .check {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+}
+
+.featured .check::after {
+    color: var(--color-text-on-primary);
+}
+
+.cta {
+    width: 100%;
+    margin-top: auto;
+    /* Glow strength is provisional, estimated from the raster reference. */
+    box-shadow:
+        0 0 0.75rem rgb(138 65 255 / 30%),
+        0 0 1.5rem rgb(138 65 255 / 16%);
+}
+
+@media (min-width: 48rem) {
+    .card {
+        min-height: 25rem;
+    }
+
+    .featured {
+        min-height: 27rem;
+    }
+
+    .content {
+        min-height: inherit;
+        padding: var(--space-5) var(--space-4);
+    }
+
+    .name {
+        font-size: var(--font-size-base);
+    }
+
+    .description {
+        min-height: 6em;
+        margin-top: var(--space-4);
+    }
+
+    .priceLine {
+        margin-top: var(--space-4);
+    }
+
+    .price {
+        font-size: 2rem;
+    }
+
+    .included {
+        margin-top: var(--space-5);
+        padding-top: var(--space-4);
+    }
+
+    .features {
+        gap: var(--space-2);
+    }
+}
+
+@media (min-width: 75rem) {
+    .card {
+        min-height: 32rem;
+    }
+
+    .featured {
+        min-height: 36rem;
+    }
+
+    .content {
+        padding: var(--space-8);
+    }
+
+    .name {
+        font-size: var(--font-size-xl);
+    }
+
+    .description {
+        min-height: 4.5em;
+        margin-top: var(--space-6);
+        font-size: var(--font-size-sm);
+    }
+
+    .priceLine {
+        margin-top: var(--space-8);
+    }
+
+    .price {
+        font-size: 3rem;
+    }
+
+    .period,
+    .includedTitle,
+    .feature {
+        font-size: var(--font-size-sm);
+    }
+
+    .included {
+        margin-top: var(--space-8);
+        padding-top: var(--space-8);
+    }
+
+    .includedTitle {
+        margin-bottom: var(--space-5);
+    }
+
+    .features {
+        gap: var(--space-3);
+    }
+}
+
+@media (forced-colors: active) {
+    .featured,
+    .featured .check {
+        border-color: Highlight;
+    }
+
+    .featured .name {
+        color: Highlight;
+    }
+}

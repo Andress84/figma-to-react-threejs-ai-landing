@@ -1,0 +1,190 @@
+.section {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding-block: var(--space-20) var(--space-24);
+    background:
+        radial-gradient(ellipse at -25% 58%, rgb(119 37 14 / 24%), transparent 48%),
+        radial-gradient(ellipse at 115% 28%, rgb(0 81 142 / 24%), transparent 50%),
+        var(--color-bg);
+}
+
+.section::before,
+.section::after {
+    position: absolute;
+    z-index: -1;
+    width: 110%;
+    height: 52rem;
+    border: var(--border-width) solid transparent;
+    border-radius: 50%;
+    content: '';
+    pointer-events: none;
+}
+
+.section::before {
+    top: 10%;
+    left: -60%;
+    border-top-color: rgb(227 73 22 / 19%);
+    box-shadow: 0 -1.5rem 4rem rgb(180 52 17 / 8%);
+    transform: rotate(24deg);
+}
+
+.section::after {
+    top: 2%;
+    right: -67%;
+    border-top-color: rgb(18 109 164 / 23%);
+    box-shadow: 0 -1.5rem 4rem rgb(0 81 142 / 10%);
+    transform: rotate(-22deg);
+}
+
+.content {
+    position: relative;
+    z-index: 1;
+}
+
+.intro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.heading {
+    max-width: 18ch;
+    color: var(--color-text-primary);
+    font-size: var(--font-size-heading);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-heading);
+    letter-spacing: var(--letter-spacing-heading);
+    text-wrap: balance;
+}
+
+.description {
+    max-width: 42rem;
+    margin-top: var(--space-5);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-copy);
+    text-wrap: pretty;
+}
+
+.billing {
+    display: flex;
+    align-items: center;
+    width: max-content;
+    max-width: 100%;
+    margin: var(--space-8) auto 0;
+    padding: var(--space-1);
+    border: var(--border-subtle);
+    border-radius: var(--radius-full);
+    background: color-mix(in srgb, var(--color-surface) 90%, var(--color-text-primary));
+}
+
+.billing button {
+    min-width: 5rem;
+    min-height: 2.5rem;
+    padding: var(--space-2) var(--space-4);
+    border: 0;
+    border-radius: var(--radius-full);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-control);
+}
+
+.billing .activePeriod {
+    background: color-mix(in srgb, var(--color-surface) 75%, var(--color-text-primary));
+    color: var(--color-text-primary);
+    cursor: default;
+}
+
+.unavailablePeriod {
+    background: transparent;
+    cursor: not-allowed;
+}
+
+.visuallyHidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.plans {
+    display: grid;
+    gap: var(--space-5);
+    max-width: 28rem;
+    margin: var(--space-10) auto 0;
+}
+
+@media (min-width: 48rem) {
+    .section {
+        padding-block: var(--space-24) var(--space-32);
+    }
+
+    .heading {
+        max-width: 23ch;
+    }
+
+    .description {
+        margin-top: var(--space-6);
+        font-size: var(--font-size-sm);
+    }
+
+    .billing {
+        margin-top: var(--space-12);
+    }
+
+    .plans {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        align-items: end;
+        gap: 0;
+        max-width: none;
+        margin-top: var(--space-16);
+        padding-bottom: var(--space-3);
+    }
+
+    .plans > :first-child {
+        border-radius: var(--radius-md) 0 0 var(--radius-md);
+    }
+
+    .plans > :last-child {
+        border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    }
+
+    .plans > :nth-child(2) {
+        z-index: 1;
+        margin-inline: -1px;
+        transform: translateY(var(--space-3));
+    }
+}
+
+@media (min-width: 75rem) {
+    .section {
+        padding-block: var(--space-32) 10rem;
+    }
+
+    .heading span {
+        display: block;
+    }
+
+    .description {
+        max-width: 41rem;
+        font-size: var(--font-size-base);
+    }
+
+    .plans {
+        margin-top: var(--space-20);
+    }
+}
+
+@media (forced-colors: active) {
+    .billing {
+        border-color: CanvasText;
+    }
+
+    .activePeriod {
+        outline: var(--border-width) solid Highlight;
+    }
+}
