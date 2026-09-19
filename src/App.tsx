@@ -6,6 +6,7 @@ import { HeroSection } from './components/sections/HeroSection'
 import { PricingSection } from './components/sections/PricingSection'
 import { ResultsSection } from './components/sections/ResultsSection'
 import { SiteHeader } from './components/sections/SiteHeader'
+import { SiteFooter } from './components/sections/SiteFooter'
 import styles from './App.module.css'
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
         <FaqSection />
         <FinalCtaSection />
       </main>
+      <SiteFooter />
     </>
   )
 }
