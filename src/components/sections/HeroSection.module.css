@@ -4,16 +4,34 @@
     padding-block: var(--space-12) var(--space-8);
 }
 
-/* Static lighting only. The clipped gradient layer can later host the WebGL effect. */
+.hero::after {
+    position: absolute;
+    z-index: 2;
+    right: 0;
+    bottom: -1px;
+    left: 0;
+    height: clamp(7rem, 20vh, 12rem);
+    background: linear-gradient(
+        180deg,
+        transparent 0%,
+        rgb(1 1 1 / 18%) 28%,
+        rgb(1 1 1 / 72%) 70%,
+        var(--color-bg) 100%
+    );
+    pointer-events: none;
+    content: '';
+}
+
+/* This restrained static treatment remains visible while WebGL loads or is unavailable. */
 .backdrop {
     position: absolute;
-    z-index: -1;
+    z-index: 0;
     inset: calc(-1 * var(--site-header-height)) 0 0;
     overflow: hidden;
     pointer-events: none;
     background:
-        radial-gradient(ellipse at 110% 70%, var(--color-hero-warm-glow), transparent 35%),
-        radial-gradient(ellipse at 65% 64%, var(--color-hero-blue-glow), transparent 65%),
+        radial-gradient(ellipse at -10% 70%, var(--color-hero-warm-glow), transparent 35%),
+        radial-gradient(ellipse at 110% 64%, var(--color-hero-blue-glow), transparent 50%),
         var(--color-bg);
 }
 
@@ -24,9 +42,11 @@
     height: 95%;
     border: var(--border-width) solid var(--color-hero-light-edge);
     border-radius: 50%;
+    opacity: 0.24;
     box-shadow:
-        0 0 3rem var(--color-hero-blue-glow),
-        inset 0 0 3rem var(--color-hero-blue-glow);
+        0 0 2.25rem var(--color-hero-blue-glow),
+        inset 0 0 2.25rem var(--color-hero-blue-glow);
+    filter: blur(0.2rem);
     content: '';
 }
 
@@ -34,17 +54,19 @@
     top: -12%;
     left: -55%;
     transform: rotate(-28deg);
+    border-color: var(--color-hero-warm-glow);
+    box-shadow: 0 0 2.25rem var(--color-hero-warm-glow);
 }
 
 .backdrop::after {
     top: -4%;
     right: -80%;
     transform: rotate(-42deg);
-    border-color: var(--color-hero-warm-glow);
-    box-shadow: 0 0 3rem var(--color-hero-warm-glow);
 }
 
 .content {
+    position: relative;
+    z-index: 3;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -133,7 +155,7 @@
     .backdrop {
         background:
             radial-gradient(ellipse at -15% 82%, var(--color-hero-warm-glow), transparent 35%),
-            radial-gradient(ellipse at 115% 74%, var(--color-hero-warm-glow), transparent 35%),
+            radial-gradient(ellipse at 115% 74%, var(--color-hero-blue-glow), transparent 35%),
             radial-gradient(ellipse at 50% 66%, var(--color-hero-blue-glow), transparent 65%),
             var(--color-bg);
     }
@@ -189,6 +211,18 @@
         flex: 1 0 auto;
         align-items: center;
         padding-block: var(--space-10);
+    }
+
+    .hero::after {
+        height: clamp(10rem, 25vh, 15rem);
+        background: linear-gradient(
+            180deg,
+            transparent 0%,
+            rgb(1 1 1 / 12%) 24%,
+            rgb(1 1 1 / 58%) 62%,
+            rgb(1 1 1 / 92%) 88%,
+            var(--color-bg) 100%
+        );
     }
 
     .socialProof {

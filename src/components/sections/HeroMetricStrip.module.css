@@ -4,9 +4,16 @@
 
 @media (min-width: 75rem) {
     .strip {
+        position: relative;
+        z-index: 3;
         display: block;
         padding-block: var(--space-10);
         border: var(--border-subtle);
+        background: linear-gradient(
+            180deg,
+            rgb(1 1 1 / 96%),
+            var(--color-bg) 32%
+        );
     }
 
     .container {

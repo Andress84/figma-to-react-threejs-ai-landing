@@ -1,0 +1,22 @@
+.layer {
+    position: absolute;
+    z-index: 1;
+    inset: calc(-1 * var(--site-header-height)) 0 0;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0.9;
+}
+
+.canvas {
+    width: 100% !important;
+    height: 100% !important;
+    pointer-events: none !important;
+}
+
+.layer[data-quality='constrained'] {
+    opacity: 0.74;
+}
+
+.layer[data-quality='reduced'] {
+    opacity: 0.48;
+}

@@ -1,11 +1,27 @@
+import { lazy, Suspense, useRef } from 'react'
+
 import { ButtonLink } from '../ui/ButtonLink'
 import { Container } from '../ui/Container'
 import styles from './HeroSection.module.css'
 
+const HeroBackgroundScene = lazy(
+  () => import('../three/hero/HeroBackgroundScene'),
+)
+
 export function HeroSection() {
+  const heroRef = useRef<HTMLElement>(null)
+
   return (
-    <section id="home" className={styles.hero} aria-labelledby="hero-heading">
+    <section
+      ref={heroRef}
+      id="home"
+      className={styles.hero}
+      aria-labelledby="hero-heading"
+    >
       <div className={styles.backdrop} aria-hidden="true" />
+      <Suspense fallback={null}>
+        <HeroBackgroundScene pointerTargetRef={heroRef} />
+      </Suspense>
       <Container className={styles.content}>
         <div className={styles.socialProof}>
           {/* Neutral silhouettes preserve the avatar layout until source photos exist. */}
