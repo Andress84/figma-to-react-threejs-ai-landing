@@ -3,10 +3,6 @@
     isolation: isolate;
     overflow: hidden;
     padding-block: var(--space-20) var(--space-24);
-    background:
-        radial-gradient(ellipse at 100% 95%, rgb(97 24 85 / 22%), transparent 55%),
-        radial-gradient(ellipse at 100% 50%, rgb(67 20 114 / 17%), transparent 66%),
-        var(--color-bg);
 }
 
 .content {

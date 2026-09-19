@@ -21,8 +21,10 @@ function App() {
         <FeaturesSection />
         <ResultsSection />
         <PricingSection />
-        <FaqSection />
-        <FinalCtaSection />
+        <div className={styles.faqCtaGroup}>
+          <FaqSection />
+          <FinalCtaSection />
+        </div>
       </main>
       <SiteFooter />
     </>
