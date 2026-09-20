@@ -73,6 +73,19 @@
     text-align: center;
 }
 
+/* V2's static fallback frames one space; V1's original fallback stays intact. */
+.hero[data-hero-background='v2'] .backdrop {
+    background:
+        radial-gradient(ellipse at 0% 75%, var(--color-hero-warm-glow), transparent 55%),
+        radial-gradient(ellipse at 100% 65%, var(--color-hero-blue-glow), transparent 60%),
+        var(--color-bg);
+}
+
+.hero[data-hero-background='v2'] .backdrop::before,
+.hero[data-hero-background='v2'] .backdrop::after {
+    display: none;
+}
+
 .socialProof {
     display: flex;
     align-items: center;

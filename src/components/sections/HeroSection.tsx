@@ -1,26 +1,33 @@
-import { lazy, Suspense, useRef } from 'react'
+import { lazy, Suspense, useRef, useState } from 'react'
 
 import { ButtonLink } from '../ui/ButtonLink'
 import { Container } from '../ui/Container'
+import { getHeroBackgroundVariant } from '../three/heroBackgroundVariant'
 import styles from './HeroSection.module.css'
 
 const HeroBackgroundScene = lazy(
   () => import('../three/hero/HeroBackgroundScene'),
 )
+const HeroBackgroundSceneV2 = lazy(
+  () => import('../three/heroV2/HeroBackgroundSceneV2'),
+)
 
 export function HeroSection() {
   const heroRef = useRef<HTMLElement>(null)
+  const [backgroundVariant] = useState(getHeroBackgroundVariant)
+  const Background = backgroundVariant === 'v2' ? HeroBackgroundSceneV2 : HeroBackgroundScene
 
   return (
     <section
       ref={heroRef}
       id="home"
+      data-hero-background={backgroundVariant}
       className={styles.hero}
       aria-labelledby="hero-heading"
     >
       <div className={styles.backdrop} aria-hidden="true" />
       <Suspense fallback={null}>
-        <HeroBackgroundScene pointerTargetRef={heroRef} />
+        <Background pointerTargetRef={heroRef} />
       </Suspense>
       <Container className={styles.content}>
         <div className={styles.socialProof}>
