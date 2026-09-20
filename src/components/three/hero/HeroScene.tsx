@@ -7,10 +7,14 @@ import type { Group } from 'three'
 import type { WebGLPerformanceProfile } from '../useWebGLPerformanceProfile'
 import { AmbientDepthField } from './AmbientDepthField'
 import { EnergyRibbons } from './EnergyRibbons'
-import type { HeroPointerRef } from './heroSceneTypes'
 import { StarField } from './StarField'
+import { StreamParticles } from './StreamParticles'
 import { useHeroDisplacementField } from './useHeroDisplacementField'
 import { useHeroPointer } from './useHeroPointer'
+import { HERO_CAMERA_NEUTRAL_Z, HERO_DEPTH_TUNING, useHeroDepthMotion } from './useHeroDepthMotion'
+import type { HeroDepthMotion } from './useHeroDepthMotion'
+
+export { HERO_CAMERA_NEUTRAL_Z } from './useHeroDepthMotion'
 
 interface HeroSceneProps {
   pointerTargetRef: RefObject<HTMLElement | null>
@@ -19,46 +23,34 @@ interface HeroSceneProps {
 
 interface CameraRigProps {
   ambientGroupRef: RefObject<Group | null>
-  pointerRef: HeroPointerRef
+  depthMotion: HeroDepthMotion
   ribbonsGroupRef: RefObject<Group | null>
   starsGroupRef: RefObject<Group | null>
   usePointerDepth: boolean
 }
 
-export const HERO_CAMERA_NEUTRAL_Z = 8.1
-
 function CameraRig({
   ambientGroupRef,
-  pointerRef,
+  depthMotion,
   ribbonsGroupRef,
   starsGroupRef,
   usePointerDepth,
 }: CameraRigProps) {
-  const smoothedPointer = useRef({ distance: 0.5, x: 0, y: 0 })
-
   useFrame(({ camera }, delta) => {
-    const input = pointerRef.current
-    const isActive = usePointerDepth && input.active
-    const current = smoothedPointer.current
-    current.x = usePointerDepth ? MathUtils.damp(current.x, isActive ? input.x : 0, 3.25, delta) : 0
-    current.y = usePointerDepth ? MathUtils.damp(current.y, isActive ? input.y : 0, 3.25, delta) : 0
-    current.distance = usePointerDepth
-      ? MathUtils.damp(current.distance, isActive ? input.distance : 0.5, 2.75, delta)
-      : 0.5
-
-    // Secondary depth cue only: local field displacement supplies the main interaction.
-    const x = current.x * 0.16
-    const y = current.y * 0.16
+    const isActive = usePointerDepth && depthMotion.active
+    const current = depthMotion
+    const { x, y } = current.pointer
+    const tuning = HERO_DEPTH_TUNING
     const cameraZ = isActive
-      ? HERO_CAMERA_NEUTRAL_Z + current.distance * 0.02 - (1 - current.distance) * 0.027
+      ? HERO_CAMERA_NEUTRAL_Z + (0.5 - current.distance) * tuning.cameraDepth
       : HERO_CAMERA_NEUTRAL_Z
 
     if (usePointerDepth) {
-      camera.position.x = MathUtils.damp(camera.position.x, x * 0.045, 3.25, delta)
-      camera.position.y = MathUtils.damp(camera.position.y, -y * 0.035, 3.25, delta)
+      camera.position.x = MathUtils.damp(camera.position.x, x * tuning.cameraX, 3.25, delta)
+      camera.position.y = MathUtils.damp(camera.position.y, -y * tuning.cameraY, 3.25, delta)
       camera.position.z = MathUtils.damp(camera.position.z, cameraZ, 3, delta)
-      camera.rotation.y = MathUtils.damp(camera.rotation.y, -x * 0.012, 3.25, delta)
-      camera.rotation.x = MathUtils.damp(camera.rotation.x, y * 0.009, 3.25, delta)
+      camera.rotation.y = MathUtils.damp(camera.rotation.y, -x * tuning.cameraYaw, 3.25, delta)
+      camera.rotation.x = MathUtils.damp(camera.rotation.x, y * tuning.cameraPitch, 3.25, delta)
     } else {
       // Reduced motion renders on demand: return to neutral in that single frame.
       camera.position.set(0, 0, HERO_CAMERA_NEUTRAL_Z)
@@ -70,19 +62,19 @@ function CameraRig({
     const ambient = ambientGroupRef.current
 
     if (ribbons) {
-      ribbons.rotation.y = x * 0.038
-      ribbons.rotation.x = -y * 0.018
-      ribbons.position.z = (0.5 - current.distance) * 0.013
+      ribbons.rotation.y = x * tuning.streamYaw
+      ribbons.rotation.x = -y * tuning.streamPitch
+      ribbons.position.z = (0.5 - current.distance) * tuning.streamDepth
     }
     if (stars) {
-      stars.rotation.y = -x * 0.012
-      stars.rotation.x = y * 0.007
-      stars.position.x = -x * 0.035
-      stars.position.y = y * 0.025
+      stars.rotation.y = -x * 0.006
+      stars.rotation.x = y * 0.004
+      stars.position.x = -x * 0.016
+      stars.position.y = y * 0.012
     }
     if (ambient) {
-      ambient.position.x = x * 0.018
-      ambient.position.y = -y * 0.012
+      ambient.position.x = x * 0.008
+      ambient.position.y = -y * 0.006
     }
   }, -2)
 
@@ -93,6 +85,7 @@ export function HeroScene({ pointerTargetRef, profile }: HeroSceneProps) {
   const pointerEnabled = profile.quality === 'full'
   const pointerRef = useHeroPointer(pointerTargetRef, pointerEnabled)
   const displacementField = useHeroDisplacementField(pointerRef, pointerEnabled)
+  const depthMotion = useHeroDepthMotion(pointerRef, pointerEnabled)
   const ambientGroupRef = useRef<Group>(null)
   const ribbonsGroupRef = useRef<Group>(null)
   const starsGroupRef = useRef<Group>(null)
@@ -104,14 +97,26 @@ export function HeroScene({ pointerTargetRef, profile }: HeroSceneProps) {
         <AmbientDepthField animate={animate} quality={profile.quality} />
       </group>
       <group ref={starsGroupRef}>
-        <StarField animate={animate} quality={profile.quality} />
+        <StarField animate={animate} quality={profile.quality} depthMotion={depthMotion} />
       </group>
       <group ref={ribbonsGroupRef}>
-        <EnergyRibbons animate={animate} quality={profile.quality} displacementField={displacementField} />
+        <EnergyRibbons
+          animate={animate}
+          quality={profile.quality}
+          displacementField={displacementField}
+          depthMotion={depthMotion}
+        />
+        {animate && profile.quality !== 'reduced' && (
+          <StreamParticles
+            quality={profile.quality}
+            displacementField={displacementField}
+            depthMotion={depthMotion}
+          />
+        )}
       </group>
       <CameraRig
         ambientGroupRef={ambientGroupRef}
-        pointerRef={pointerRef}
+        depthMotion={depthMotion}
         ribbonsGroupRef={ribbonsGroupRef}
         starsGroupRef={starsGroupRef}
         usePointerDepth={pointerEnabled}

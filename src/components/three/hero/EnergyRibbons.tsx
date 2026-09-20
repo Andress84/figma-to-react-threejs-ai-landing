@@ -4,27 +4,31 @@ import {
   AdditiveBlending,
   BufferAttribute,
   BufferGeometry,
-  CatmullRomCurve3,
+  type CatmullRomCurve3,
   Color,
   DoubleSide,
   type Mesh,
   ShaderMaterial,
+  Vector2,
   Vector3,
 } from 'three'
 
 import type { WebGLQuality } from '../useWebGLPerformanceProfile'
 import type { HeroDisplacementField } from './heroDisplacementField'
 import { energyFieldFragmentShader, energyFieldVertexShader } from './energyFieldShaders'
+import { buildStreamCurve, getStreamSwell, getStreamWidth } from './heroStreamPaths'
+import type { StreamSide } from './heroStreamPaths'
+import { HERO_CAMERA_NEUTRAL_Z } from './useHeroDepthMotion'
+import type { HeroDepthMotion } from './useHeroDepthMotion'
 
 interface EnergyRibbonsProps {
   animate: boolean
   quality: WebGLQuality
   displacementField: HeroDisplacementField
+  depthMotion: HeroDepthMotion
 }
 
-type StreamSide = 'left' | 'right'
-
-interface EnergyFieldProps extends EnergyRibbonsProps {
+interface EnergyStreamProps extends EnergyRibbonsProps {
   height: number
   side: StreamSide
   width: number
@@ -33,37 +37,30 @@ interface EnergyFieldProps extends EnergyRibbonsProps {
 const FIELD_APPEARANCE = {
   left: {
     colors: ['#4a141e', '#e24c24', '#ffb65a'],
-    width: 0.58,
     opacity: 0.64,
     phase: 0.7,
   },
   right: {
     colors: ['#071839', '#0960d8', '#41d5ff'],
-    width: 0.65,
     opacity: 0.66,
     phase: 4.1,
   },
 } as const
 
-function buildCurve(side: StreamSide, width: number, height: number) {
-  const direction = side === 'left' ? -1 : 1
-  const portraitEdgeBias = Math.max(0, 0.92 - width / height) * 0.12
-  // The original Figma-directed paths remain the composition anchors.
-  const xFractions = side === 'left'
-    ? [0.73, 0.535, 0.4, 0.345, 0.39, 0.54, 0.82]
-    : [0.44, 0.375, 0.315, 0.285, 0.32, 0.46, 0.82]
-  const yFractions = side === 'left'
-    ? [-0.82, -0.62, -0.38, -0.12, 0.1, 0.32, 0.62]
-    : [-0.76, -0.58, -0.37, -0.13, 0.1, 0.34, 0.65]
-  const zPositions = side === 'left'
-    ? [-3.4, -1.45, 0.15, 0.42, 0.1, -1.1, -3.4]
-    : [-1.65, -0.65, 0.25, 0.66, 0.32, -1, -3.8]
+// Opacity weights sum to one so layering adds depth without tripling brightness.
+const STREAM_LAYERS = {
+  back: { depth: -1.05, speed: 0.78, phase: -0.55, parallaxPx: -26, push: -0.34, brightness: -0.12 },
+  mid: { depth: 0, speed: 1, phase: 0, parallaxPx: 6, push: 0.1, brightness: 0.04 },
+  front: { depth: 0.82, speed: 1.22, phase: 0.46, parallaxPx: 48, push: 0.58, brightness: 0.2 },
+} as const
 
-  return new CatmullRomCurve3(xFractions.map((x, index) => new Vector3(
-    direction * width * (x + portraitEdgeBias),
-    height * yFractions[index],
-    zPositions[index],
-  )), false, 'catmullrom', 0.48)
+type StreamLayer = keyof typeof STREAM_LAYERS
+
+interface EnergyLayerProps extends EnergyRibbonsProps {
+  geometry: BufferGeometry
+  layer: StreamLayer
+  opacityWeight: number
+  side: StreamSide
 }
 
 function createFieldGeometry(
@@ -83,8 +80,7 @@ function createFieldGeometry(
     const center = curve.getPointAt(along)
     const tangent = curve.getTangentAt(along)
     const transverse = tangent.cross(viewDirection).normalize()
-    const swell = 0.72 + Math.sin(Math.PI * along) * 0.23
-      + Math.exp(-Math.pow((along - 0.28) / 0.25, 2)) * 0.26
+    const swell = getStreamSwell(along)
 
     for (let column = 0; column <= acrossSegments; column += 1) {
       const across = column / acrossSegments
@@ -111,56 +107,82 @@ function createFieldGeometry(
   return geometry
 }
 
-function EnergyField({ animate, displacementField, height, quality, side, width }: EnergyFieldProps) {
+function EnergyLayer({
+  animate, depthMotion, displacementField, geometry, layer, opacityWeight, quality, side,
+}: EnergyLayerProps) {
   const meshRef = useRef<Mesh<BufferGeometry, ShaderMaterial>>(null)
   const elapsed = useRef(0)
-  const { geometry, material } = useMemo(() => {
+  const material = useMemo(() => {
     const appearance = FIELD_APPEARANCE[side]
-    const full = quality === 'full'
-    const geometry = createFieldGeometry(
-      buildCurve(side, width, height),
-      full ? 128 : quality === 'constrained' ? 64 : 40,
-      full ? 20 : quality === 'constrained' ? 8 : 4,
-      Math.min(height, width * 1.45) * appearance.width,
-    )
-    const material = new ShaderMaterial({
+    const profile = STREAM_LAYERS[layer]
+    return new ShaderMaterial({
       blending: AdditiveBlending,
       depthTest: false,
       depthWrite: false,
       side: DoubleSide,
       transparent: true,
       toneMapped: false,
-      defines: { FIELD_DETAIL: full ? 1 : 0 },
+      defines: { FIELD_DETAIL: quality === 'full' && layer === 'mid' ? 1 : 0 },
       uniforms: {
         uDisplacement: { value: displacementField.texture },
         uFieldResolution: { value: displacementField.resolution },
         uFieldPadding: { value: displacementField.padding },
         uCanvasSize: { value: displacementField.canvasSize },
+        uRestCameraZ: { value: HERO_CAMERA_NEUTRAL_Z },
+        uLayerDepth: { value: profile.depth },
+        uDepthShift: { value: 0 },
+        uParallax: { value: new Vector2() },
+        uBrightness: { value: 1 },
         uEdgeColor: { value: new Color(appearance.colors[0]) },
         uBodyColor: { value: new Color(appearance.colors[1]) },
         uHighlightColor: { value: new Color(appearance.colors[2]) },
-        uOpacity: { value: appearance.opacity },
-        uPhase: { value: appearance.phase },
+        uOpacity: { value: appearance.opacity * opacityWeight },
+        uPhase: { value: appearance.phase + profile.phase },
         uTime: { value: 0 },
       },
       vertexShader: energyFieldVertexShader,
       fragmentShader: energyFieldFragmentShader,
     })
-    return { geometry, material }
-  }, [displacementField, height, quality, side, width])
+  }, [displacementField, layer, opacityWeight, quality, side])
 
-  useEffect(() => () => {
-    geometry.dispose()
-    material.dispose()
-  }, [geometry, material])
+  useEffect(() => () => material.dispose(), [material])
 
   useFrame((_, delta) => {
     if (animate) elapsed.current += Math.min(delta, 0.05)
     const shader = meshRef.current?.material
-    if (shader) shader.uniforms.uTime.value = animate ? elapsed.current : 0
+    if (!shader) return
+    const profile = STREAM_LAYERS[layer]
+    const focus = quality === 'full' ? depthMotion.focus[side === 'left' ? 'x' : 'y'] : 0
+    const { x, y } = depthMotion.pointer
+    const approach = focus * (0.9 - y * 0.1)
+    shader.uniforms.uTime.value = animate ? elapsed.current * profile.speed : 0
+    shader.uniforms.uParallax.value.set(x * profile.parallaxPx * focus, -y * profile.parallaxPx * 0.6 * focus)
+    shader.uniforms.uDepthShift.value = approach * profile.push
+    shader.uniforms.uBrightness.value = 1 + approach * profile.brightness
   })
 
   return <mesh ref={meshRef} geometry={geometry} material={material} renderOrder={1} frustumCulled={false} />
+}
+
+function EnergyStream(props: EnergyStreamProps) {
+  const { height, quality, side, width } = props
+  // All layers share the same path and geometry; only material/depth parameters differ.
+  const geometry = useMemo(() => createFieldGeometry(
+    buildStreamCurve(side, width, height),
+    quality === 'full' ? 128 : quality === 'constrained' ? 64 : 40,
+    quality === 'full' ? 20 : quality === 'constrained' ? 8 : 4,
+    getStreamWidth(side, width, height),
+  ), [height, quality, side, width])
+
+  useEffect(() => () => geometry.dispose(), [geometry])
+
+  return (
+    <>
+      <EnergyLayer {...props} geometry={geometry} layer="back" opacityWeight={0.3} />
+      <EnergyLayer {...props} geometry={geometry} layer="mid" opacityWeight={quality === 'full' ? 0.46 : 0.7} />
+      {quality === 'full' && <EnergyLayer {...props} geometry={geometry} layer="front" opacityWeight={0.24} />}
+    </>
+  )
 }
 
 export function EnergyRibbons(props: EnergyRibbonsProps) {
@@ -168,8 +190,8 @@ export function EnergyRibbons(props: EnergyRibbonsProps) {
 
   return (
     <>
-      <EnergyField {...props} height={height} width={width} side="left" />
-      <EnergyField {...props} height={height} width={width} side="right" />
+      <EnergyStream {...props} height={height} width={width} side="left" />
+      <EnergyStream {...props} height={height} width={width} side="right" />
     </>
   )
 }

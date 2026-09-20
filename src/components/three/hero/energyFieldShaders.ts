@@ -3,6 +3,10 @@ export const energyFieldVertexShader = /* glsl */ `
   uniform vec2 uFieldResolution;
   uniform float uFieldPadding;
   uniform vec2 uCanvasSize;
+  uniform float uRestCameraZ;
+  uniform float uLayerDepth;
+  uniform float uDepthShift;
+  uniform vec2 uParallax;
 
   varying vec2 vUv;
   varying vec2 vScreenUv;
@@ -27,7 +31,14 @@ export const energyFieldVertexShader = /* glsl */ `
 
   void main() {
     vUv = uv;
-    vec4 projected = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    vec3 layeredPosition = position;
+    // Compensate the resting depth in XY to preserve the original projected path.
+    // Only the small interactive push changes apparent size/perspective.
+    float restDistance = max(1.0, uRestCameraZ - position.z);
+    layeredPosition.xy *= (restDistance - uLayerDepth) / restDistance;
+    layeredPosition.z += uLayerDepth + uDepthShift;
+    vec4 projected = projectionMatrix * modelViewMatrix * vec4(layeredPosition, 1.0);
+    projected.xy += uParallax * 2.0 / uCanvasSize * projected.w;
     vec2 screenUv = projected.xy / projected.w * 0.5 + 0.5;
     // Apply CSS-pixel offsets after projection: radius and strength do not depend on DPR or depth.
     projected.xy += sampleDisplacement(screenUv) * 2.0 / uCanvasSize * projected.w;
@@ -43,6 +54,7 @@ export const energyFieldFragmentShader = /* glsl */ `
   uniform float uPhase;
   uniform float uTime;
   uniform float uOpacity;
+  uniform float uBrightness;
 
   varying vec2 vUv;
   varying vec2 vScreenUv;
@@ -115,7 +127,7 @@ export const energyFieldFragmentShader = /* glsl */ `
 
     vec3 color = mix(uEdgeColor, uBodyColor, clamp(density * 0.94, 0.0, 1.0));
     color = mix(color, uHighlightColor, internalLight * 0.57 + filament);
-    gl_FragColor = vec4(color, alpha);
+    gl_FragColor = vec4(color * uBrightness, alpha);
     #include <colorspace_fragment>
   }
 `

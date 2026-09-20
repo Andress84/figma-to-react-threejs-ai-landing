@@ -6,14 +6,18 @@ import {
   BufferGeometry,
   Color,
   ShaderMaterial,
+  Vector2,
 } from 'three'
 import type { Points } from 'three'
 
 import type { WebGLQuality } from '../useWebGLPerformanceProfile'
+import { HERO_DEPTH_TUNING } from './useHeroDepthMotion'
+import type { HeroDepthMotion } from './useHeroDepthMotion'
 
 interface StarFieldProps {
   animate: boolean
   quality: WebGLQuality
+  depthMotion: HeroDepthMotion
 }
 
 const starVertexShader = /* glsl */ `
@@ -21,6 +25,9 @@ const starVertexShader = /* glsl */ `
   attribute vec3 aColor;
 
   uniform float uPixelRatio;
+  uniform vec2 uPointer;
+  uniform vec2 uCanvasSize;
+  uniform float uParallaxPx;
 
   varying vec3 vColor;
 
@@ -28,6 +35,10 @@ const starVertexShader = /* glsl */ `
     vColor = aColor;
     vec4 viewPosition = modelViewMatrix * vec4(position, 1.0);
     gl_Position = projectionMatrix * viewPosition;
+    // Continuous far-to-mid layering in one draw call, using the existing star depths.
+    float depthWeight = mix(0.14, 1.0, smoothstep(-5.8, 1.4, position.z));
+    vec2 parallax = vec2(-uPointer.x, uPointer.y * 0.6) * uParallaxPx * depthWeight;
+    gl_Position.xy += parallax * 2.0 / uCanvasSize * gl_Position.w;
     gl_PointSize = uPixelRatio * aSize * (15.0 / max(1.0, -viewPosition.z));
   }
 `
@@ -62,18 +73,18 @@ function mulberry32(seed: number) {
 
 function getParticleCount(quality: WebGLQuality) {
   if (quality === 'full') {
-    return 360
+    return 440
   }
 
   if (quality === 'constrained') {
-    return 150
+    return 160
   }
 
   return 72
 }
 
-export function StarField({ animate, quality }: StarFieldProps) {
-  const pointsRef = useRef<Points>(null)
+export function StarField({ animate, depthMotion, quality }: StarFieldProps) {
+  const pointsRef = useRef<Points<BufferGeometry, ShaderMaterial>>(null)
   const { height, width } = useThree((state) => state.viewport)
   const pixelRatio = useThree((state) => state.gl.getPixelRatio())
   const { geometry, material } = useMemo(() => {
@@ -122,15 +133,18 @@ export function StarField({ animate, quality }: StarFieldProps) {
       toneMapped: false,
       transparent: true,
       uniforms: {
-        uOpacity: { value: quality === 'full' ? 0.52 : 0.4 },
+        uOpacity: { value: quality === 'full' ? 0.56 : 0.4 },
         uPixelRatio: { value: pixelRatio },
+        uPointer: { value: depthMotion.pointer },
+        uCanvasSize: { value: new Vector2(1, 1) },
+        uParallaxPx: { value: quality === 'full' ? HERO_DEPTH_TUNING.starParallaxPx : 0 },
       },
       vertexShader: starVertexShader,
       vertexColors: true,
     })
 
     return { geometry: nextGeometry, material: nextMaterial }
-  }, [height, pixelRatio, quality, width])
+  }, [depthMotion, height, pixelRatio, quality, width])
 
   useEffect(
     () => () => {
@@ -139,18 +153,23 @@ export function StarField({ animate, quality }: StarFieldProps) {
     }, [geometry, material],
   )
 
-  useFrame(({ clock }) => {
-    if (!animate || !pointsRef.current) {
+  useFrame(({ clock, size }) => {
+    const points = pointsRef.current
+    if (!points) return
+    points.material.uniforms.uCanvasSize.value.set(size.width, size.height)
+    if (!animate) {
+      points.rotation.set(0, 0, 0)
+      points.position.z = 0
       return
     }
 
     const time = clock.getElapsedTime()
     const motionStrength = quality === 'full' ? 1 : 0.5
-    pointsRef.current.rotation.y =
+    points.rotation.y =
       Math.sin(time * 0.027) * 0.012 * motionStrength
-    pointsRef.current.rotation.z =
+    points.rotation.z =
       Math.sin(time * 0.021 + 0.8) * 0.009 * motionStrength
-    pointsRef.current.position.z =
+    points.position.z =
       Math.sin(time * 0.034) * 0.045 * motionStrength
   })
 
