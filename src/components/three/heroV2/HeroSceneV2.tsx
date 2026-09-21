@@ -8,6 +8,8 @@ import type { WebGLPerformanceProfile } from '../useWebGLPerformanceProfile'
 import { useHeroPointer } from '../hero/useHeroPointer'
 import { useHeroDisplacementField } from '../hero/useHeroDisplacementField'
 import { FieldEnvironment } from './FieldEnvironment'
+import { DepthStars } from './DepthStars'
+import { AIFormation } from './AIFormation'
 import { V2_CAMERA_Z, V2_MOTION } from './fieldSettings'
 
 interface HeroSceneV2Props {
@@ -45,8 +47,12 @@ export function HeroSceneV2({ pointerTargetRef, profile }: HeroSceneV2Props) {
 
   return (
     <group ref={group}>
+      <DepthStars aspect={aspect} quality={profile.quality} motion={motionRef}
+        animate={profile.shouldAnimateContinuously} />
       <FieldEnvironment aspect={aspect} quality={profile.quality}
         animate={profile.shouldAnimateContinuously} field={field} />
+      <AIFormation pointerTargetRef={pointerTargetRef} field={field}
+        quality={profile.quality} animate={profile.shouldAnimateContinuously} />
     </group>
   )
 }

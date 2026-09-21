@@ -19,7 +19,7 @@ const fieldCoordinates = /* glsl */ `
   }
 `
 
-const localInteraction = /* glsl */ `
+export const localInteraction = /* glsl */ `
   uniform sampler2D uDisplacement;
   uniform vec2 uFieldResolution;
   uniform float uFieldPadding;
