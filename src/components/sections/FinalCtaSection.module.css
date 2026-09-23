@@ -99,6 +99,12 @@
     }
 }
 
+@media (min-width: 48rem) and (max-width: 74.999rem) {
+    .orbitMote:nth-of-type(n + 19) {
+        display: none;
+    }
+}
+
 @media (min-width: 75rem) {
     .section {
         padding-bottom: 9rem;
@@ -156,5 +162,236 @@
 @media (forced-colors: active) {
     .panel {
         border: var(--border-width) solid CanvasText;
+    }
+}
+
+/* The orbit is clipped to the CTA panel without clipping the crossing CTA button. */
+.orbitViewport {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    overflow: hidden;
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+.orbitAnchor {
+    --orbit-base-radius: 7.04rem;
+    position: absolute;
+    top: 0.5rem;
+    left: 50%;
+    width: 16rem;
+    height: 16rem;
+    perspective: 900px;
+    transform: translateX(-50%) rotateX(11deg);
+    mask-image: linear-gradient(
+        to bottom,
+        #000 0%,
+        #000 14%,
+        rgb(0 0 0 / 72%) 43%,
+        rgb(0 0 0 / 22%) 76%,
+        transparent 100%
+    );
+    pointer-events: none;
+}
+
+.orbitEntry,
+.orbitTilt {
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+}
+
+.orbitAmbient {
+    position: absolute;
+    inset: -3.5rem;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle, rgb(169 126 255 / 16%) 25%, rgb(99 50 170 / 12%) 47%, transparent 72%);
+    filter: blur(17px);
+    animation: orbitBreath 9s ease-in-out infinite alternate;
+}
+
+.orbitBase {
+    position: absolute;
+    inset: 6%;
+    border: 1px solid rgb(203 181 255 / 44%);
+    border-radius: 50%;
+    box-shadow:
+        0 0 25px rgb(130 80 220 / 17%),
+        inset 0 0 18px rgb(160 108 255 / 11%);
+}
+
+.orbitGlow,
+.orbitHighlight {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.orbitGlow {
+    background: conic-gradient(
+        from 24deg,
+        transparent 0deg 18deg,
+        rgb(165 110 255 / 13%) 28deg,
+        rgb(199 161 255 / 76%) 71deg,
+        rgb(123 67 222 / 25%) 111deg,
+        transparent 137deg 198deg,
+        rgb(121 122 223 / 29%) 225deg,
+        rgb(198 164 255 / 56%) 264deg,
+        transparent 302deg 360deg
+    );
+    filter: blur(13px);
+    mask-image: radial-gradient(circle, transparent 37%, #000 42%, #000 50%, transparent 54%);
+    animation: orbitClockwise 28s linear infinite;
+}
+
+.orbitHighlight {
+    background: conic-gradient(
+        from 6deg,
+        transparent 0deg 19deg,
+        rgb(202 177 255 / 52%) 34deg,
+        rgb(244 234 255 / 88%) 67deg,
+        rgb(175 130 255 / 56%) 95deg,
+        transparent 124deg 207deg,
+        rgb(176 154 255 / 20%) 226deg,
+        rgb(211 188 255 / 64%) 268deg,
+        transparent 298deg 360deg
+    );
+    filter: drop-shadow(0 0 9px rgb(202 162 255 / 58%));
+    mask-image: radial-gradient(circle, transparent 42%, #000 43%, #000 44.5%, transparent 45.5%);
+    animation: orbitClockwise 22s linear infinite;
+}
+
+.orbitMote {
+    position: absolute;
+    top: calc(50% - var(--orbit-mote-size) / 2);
+    left: calc(50% - var(--orbit-mote-size) / 2);
+    width: var(--orbit-mote-size);
+    height: var(--orbit-mote-size);
+    border-radius: 50%;
+    background: #e6d9ff;
+    box-shadow: 0 0 0.4rem currentColor;
+    color: #c9b0ff;
+    opacity: var(--orbit-mote-opacity);
+    animation: orbitMoteClockwise var(--orbit-mote-duration) linear var(--orbit-mote-delay) infinite;
+}
+
+.orbitMote[data-depth='far'] {
+    color: #b0bce9;
+}
+
+.orbitMote[data-depth='near'] {
+    color: #eee1ff;
+    box-shadow: 0 0 0.55rem currentColor;
+}
+
+.heading span {
+    display: block;
+}
+
+.cta {
+    transition: box-shadow 360ms ease;
+}
+
+.cta > span:last-child {
+    transition: transform 360ms ease;
+}
+
+@keyframes orbitClockwise {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes orbitMoteClockwise {
+    from {
+        transform: rotate(var(--orbit-angle))
+            translateX(calc(var(--orbit-base-radius) + var(--orbit-radius-offset)));
+    }
+
+    to {
+        transform: rotate(calc(var(--orbit-angle) + 360deg))
+            translateX(calc(var(--orbit-base-radius) + var(--orbit-radius-offset)));
+    }
+}
+
+@keyframes orbitBreath {
+    to {
+        opacity: 0.7;
+        transform: scale(1.055);
+    }
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .cta:hover {
+        box-shadow: 0 0 1.75rem rgb(136 68 255 / 28%);
+    }
+
+    .cta:hover > span:last-child {
+        transform: translateX(3px);
+    }
+}
+
+@media (min-width: 48rem) {
+    .orbitAnchor {
+        --orbit-base-radius: 8.36rem;
+        width: 19rem;
+        height: 19rem;
+    }
+}
+
+@media (min-width: 75rem) {
+    .orbitAnchor {
+        --orbit-base-radius: 9.24rem;
+        width: 21rem;
+        height: 21rem;
+    }
+}
+
+@media (max-width: 47.999rem) {
+    .orbitAnchor {
+        --orbit-base-radius: 7.04rem;
+        width: 16rem;
+        height: 16rem;
+    }
+
+    .orbitMote:nth-of-type(n + 13) {
+        display: none;
+    }
+}
+
+.orbitAnchor[data-quality='constrained'] .orbitGlow {
+    opacity: 0.66;
+}
+
+.orbitAnchor[data-quality='reduced'] .orbitAmbient,
+.orbitAnchor[data-quality='reduced'] .orbitGlow,
+.orbitAnchor[data-quality='reduced'] .orbitHighlight,
+.orbitAnchor[data-quality='reduced'] .orbitMote {
+    animation: none;
+}
+
+.orbitAnchor[data-quality='reduced'] .orbitMote {
+    transform: rotate(var(--orbit-angle))
+        translateX(calc(var(--orbit-base-radius) + var(--orbit-radius-offset)));
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cta,
+    .cta > span:last-child {
+        transition: none;
+    }
+}
+
+@media (forced-colors: active) {
+    .orbitAmbient,
+    .orbitGlow,
+    .orbitHighlight,
+    .orbitMote {
+        display: none;
+    }
+
+    .orbitBase {
+        border-color: CanvasText;
     }
 }
