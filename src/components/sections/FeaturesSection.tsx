@@ -1,44 +1,65 @@
+import { lazy, Suspense, useSyncExternalStore } from 'react'
+import type { RefObject } from 'react'
+
 import { features } from '../../data/features'
+import type { FeatureCrossMotion } from '../three/FeatureCross'
 import { Container } from '../ui/Container'
 import { FeatureCard } from './FeatureCard'
 import styles from './FeaturesSection.module.css'
 
-export function FeaturesSection() {
+const FeatureCross = lazy(() => import('../three/FeatureCross'))
+const WIDE_QUERY = '(min-width: 75rem)'
+
+function subscribeToWideScreen(onChange: () => void) {
+  const query = window.matchMedia(WIDE_QUERY)
+  query.addEventListener('change', onChange)
+  return () => query.removeEventListener('change', onChange)
+}
+
+function getWideScreen() {
+  return window.matchMedia(WIDE_QUERY).matches
+}
+
+export function FeaturesSection({ motionRef, interactive }: {
+  motionRef: RefObject<FeatureCrossMotion>
+  interactive: boolean
+}) {
+  const showCross = useSyncExternalStore(subscribeToWideScreen, getWideScreen, () => false)
   return (
     <section
       id="product"
       className={styles.section}
       aria-labelledby="features-heading"
+      data-scroll-features
     >
       <Container>
         <div className={styles.intro}>
           <header className={styles.header}>
             <h2 id="features-heading" className={styles.heading}>
-              <span>Built for Modern Teams.</span>
-              <span>
+              <span data-scroll-title-line>Built for Modern Teams.</span>
+              <span data-scroll-title-line>
                 Powered by <strong>AI.</strong>
               </span>
             </h2>
-            <p className={styles.description}>
+            <p className={styles.description} data-scroll-intro-copy>
               Automate daily workflows, connect your tools, and help your team
               move faster with one intelligent SaaS platform.
             </p>
           </header>
 
-          <svg
-            className={styles.artwork}
-            aria-hidden="true"
-            viewBox="0 0 180 150"
-            focusable="false"
-          >
-            <g fill="none" stroke="currentColor" strokeWidth="1.25">
-              <path d="m26 48 42-18 18 42-42 18z" />
-              <path d="m62 22 42-18 18 42-42 18z" />
-              <path d="m91 50 42-18 18 42-42 18z" />
-              <path d="m43 86 42-18 18 42-42 18z" />
-              <path d="m79 78 42-18 18 42-42 18z" />
-            </g>
-          </svg>
+          <div className={styles.artwork} aria-hidden="true" data-scroll-cross>
+            {showCross && <Suspense fallback={<svg viewBox="0 0 180 150" focusable="false">
+              <g fill="none" stroke="currentColor" strokeWidth="1.25">
+                <path d="m26 48 42-18 18 42-42 18z" />
+                <path d="m62 22 42-18 18 42-42 18z" />
+                <path d="m91 50 42-18 18 42-42 18z" />
+                <path d="m43 86 42-18 18 42-42 18z" />
+                <path d="m79 78 42-18 18 42-42 18z" />
+              </g>
+            </svg>}>
+              <FeatureCross motionRef={motionRef} interactive={interactive} />
+            </Suspense>}
+          </div>
         </div>
 
         <ul className={styles.grid}>

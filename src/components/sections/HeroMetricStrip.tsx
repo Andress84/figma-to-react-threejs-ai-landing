@@ -9,7 +9,7 @@ const metrics = [
 
 export function HeroMetricStrip() {
   return (
-    <section className={styles.strip} aria-label="Platform metrics">
+    <section className={styles.strip} aria-label="Platform metrics" data-scroll-metrics>
       <Container className={styles.container}>
         <dl className={styles.metrics}>
           {metrics.map(({ label, value }) => (

@@ -5,6 +5,11 @@ export type Plan = {
   price: string
   billingPeriod: string
   discount?: string
+  yearly: {
+    price: string
+    billingPeriod: string
+    annualTotal?: string
+  }
   features: string[]
   ctaLabel: string
   ctaHref: string
@@ -18,6 +23,10 @@ export const plans: Plan[] = [
     description: 'For individuals and small teams exploring AI-powered workflows.',
     price: '$0',
     billingPeriod: '/ month',
+    yearly: {
+      price: '$0',
+      billingPeriod: '',
+    },
     features: [
       '5 AI workflows',
       'Basic automation tools',
@@ -35,6 +44,11 @@ export const plans: Plan[] = [
     price: '$19',
     billingPeriod: '/ month',
     discount: '-20%',
+    yearly: {
+      price: '$15.20',
+      billingPeriod: '/ month',
+      annualTotal: 'billed yearly ($182.40/year)',
+    },
     features: [
       'Everything in Starter',
       'Unlimited AI workflows',
@@ -55,6 +69,11 @@ export const plans: Plan[] = [
     price: '$39',
     billingPeriod: '/ month',
     discount: '-20%',
+    yearly: {
+      price: '$31.20',
+      billingPeriod: '/ month',
+      annualTotal: 'billed yearly ($374.40/year)',
+    },
     features: [
       'Everything in Pro',
       'Unlimited team members',

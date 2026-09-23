@@ -1,5 +1,10 @@
 .item {
     border-bottom: var(--border-subtle);
+    transition: border-color 380ms ease, background-color 380ms ease;
+}
+
+.item[data-open='true'] {
+    border-color: color-mix(in srgb, var(--color-primary) 20%, transparent);
 }
 
 .heading {
@@ -23,6 +28,7 @@
     line-height: 1.45;
     text-align: left;
     cursor: pointer;
+    transition: color 300ms ease;
 }
 
 .trigger span {
@@ -34,11 +40,16 @@
     width: 1.25rem;
     height: 1.25rem;
     color: var(--color-text-muted);
-    transition: transform var(--transition-fast);
+    transition: transform 410ms cubic-bezier(0.2, 0.7, 0.2, 1), color 300ms ease;
 }
 
 .chevronOpen {
     transform: rotate(180deg);
+    color: var(--color-primary);
+}
+
+.answerPanel {
+    overflow: hidden;
 }
 
 .answer {
@@ -47,6 +58,22 @@
     font-size: var(--font-size-sm);
     line-height: var(--line-height-copy);
     overflow-wrap: anywhere;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .item:hover {
+        border-color: color-mix(in srgb, var(--color-primary) 37%, transparent);
+        background: color-mix(in srgb, var(--color-primary) 3%, transparent);
+    }
+
+    .item:hover .chevron {
+        color: var(--color-primary);
+    }
+}
+
+.trigger:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: -2px;
 }
 
 @media (min-width: 48rem) {
@@ -77,5 +104,13 @@
 
     .answer {
         font-size: var(--font-size-lg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .item,
+    .trigger,
+    .chevron {
+        transition: none;
     }
 }

@@ -1,0 +1,92 @@
+.field {
+    position: absolute;
+    z-index: 0;
+    inset: -5rem 0 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.haze {
+    position: absolute;
+    inset: -1rem;
+    background:
+        radial-gradient(ellipse 42rem 23rem at 0 15%, var(--color-hero-warm-glow), transparent 80%),
+        radial-gradient(ellipse 46rem 23rem at 100% 16%, var(--color-hero-blue-glow), transparent 80%),
+        radial-gradient(ellipse 30rem 20rem at 2% 48%, var(--color-hero-warm-glow), transparent 78%),
+        radial-gradient(ellipse 34rem 22rem at 98% 52%, var(--color-hero-blue-glow), transparent 78%);
+    opacity: 0.82;
+}
+
+.layer {
+    position: absolute;
+    inset: 0;
+}
+
+.pointerLayer {
+    position: absolute;
+    inset: 0;
+}
+
+.star {
+    position: absolute;
+    top: var(--star-y);
+    left: var(--star-x);
+    width: var(--star-size);
+    height: var(--star-size);
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 0.4rem currentColor;
+    opacity: var(--star-opacity);
+}
+
+.star[data-tone='neutral'] {
+    color: #dcecff;
+}
+
+.star[data-tone='cool'] {
+    color: #8bcfff;
+}
+
+.star[data-tone='warm'] {
+    color: #ff9b70;
+}
+
+.star[data-tone='warm'],
+.star[data-tone='cool'] {
+    box-shadow: 0 0 0.55rem currentColor;
+}
+
+.star[data-depth='mid']:nth-child(2n),
+.star[data-depth='near']:nth-child(2n) {
+    animation: float var(--drift-duration) ease-in-out var(--drift-delay) infinite alternate;
+}
+
+@keyframes float {
+    to {
+        opacity: calc(var(--star-opacity) * 0.7);
+        transform: translate3d(var(--drift-x), var(--drift-y), 0);
+    }
+}
+
+@media (max-width: 74.999rem) {
+    .field {
+        z-index: 2;
+        opacity: 0.5;
+    }
+
+    .star[data-depth='near'] {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .star {
+        animation: none;
+    }
+}
+
+@media (forced-colors: active) {
+    .field {
+        display: none;
+    }
+}

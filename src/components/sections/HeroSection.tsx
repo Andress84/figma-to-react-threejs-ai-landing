@@ -25,11 +25,15 @@ export function HeroSection() {
       className={styles.hero}
       aria-labelledby="hero-heading"
     >
-      <div className={styles.backdrop} aria-hidden="true" />
-      <Suspense fallback={null}>
-        <Background pointerTargetRef={heroRef} />
-      </Suspense>
-      <Container className={styles.content}>
+      <div className={styles.atmosphere} data-scroll-atmosphere aria-hidden="true">
+        <div className={styles.backdrop} data-scroll-atmosphere-backdrop />
+        <div className={styles.sceneLayer} data-scroll-atmosphere-scene>
+          <Suspense fallback={null}>
+            <Background pointerTargetRef={heroRef} />
+          </Suspense>
+        </div>
+      </div>
+      <Container className={styles.content} data-scroll-hero-content>
         <div className={styles.socialProof}>
           {/* Neutral silhouettes preserve the avatar layout until source photos exist. */}
           <span className={styles.avatars} aria-hidden="true">

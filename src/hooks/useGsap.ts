@@ -1,8 +1,9 @@
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 // Import from this module in animated components. useGSAP scopes gsap.context to
 // a component ref and reverts its animations during StrictMode-safe cleanup.
-gsap.registerPlugin(useGSAP)
+gsap.registerPlugin(useGSAP, ScrollTrigger)
 
-export { gsap, useGSAP }
+export { gsap, ScrollTrigger, useGSAP }

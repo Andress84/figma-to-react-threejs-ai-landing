@@ -13,15 +13,15 @@ export function ResultsSection() {
     >
       <Container>
         <div className={styles.intro}>
-          <p className={styles.year}>2026</p>
+          <p className={styles.year} data-results-year>2026</p>
           <div className={styles.copy}>
-            <h2 id="results-heading" className={styles.heading}>
+            <h2 id="results-heading" className={styles.heading} data-results-intro>
               Whether your team manages daily operations, client workflows, or
               internal business processes, our AI-powered platform helps automate
               routine work, connect tools, and turn complex tasks into scalable
               systems.
             </h2>
-            <p className={styles.followUp}>
+            <p className={styles.followUp} data-results-follow-up>
               And the results? The numbers speak for themselves:
             </p>
           </div>
@@ -35,6 +35,7 @@ export function ResultsSection() {
 
         <div className={styles.cta}>
           <ButtonLink
+            data-results-cta-button
             href="#get-started"
             size="lg"
             endIcon={
@@ -51,7 +52,7 @@ export function ResultsSection() {
           >
             Get Started
           </ButtonLink>
-          <p className={styles.note}>
+          <p className={styles.note} data-results-cta-note>
             No credit card required <span aria-hidden="true" />
           </p>
         </div>

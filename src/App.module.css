@@ -5,6 +5,17 @@
         var(--color-bg);
 }
 
+.spacePassage {
+    position: relative;
+    isolation: isolate;
+    background: var(--color-bg);
+}
+
+.spacePassage > section {
+    position: relative;
+    z-index: 1;
+}
+
 @media (min-width: 75rem) {
     .firstScreen {
         display: flex;

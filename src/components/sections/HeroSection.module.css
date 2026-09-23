@@ -22,6 +22,19 @@
     content: '';
 }
 
+.atmosphere {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    pointer-events: none;
+}
+
+.sceneLayer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
 /* This restrained static treatment remains visible while WebGL loads or is unavailable. */
 .backdrop {
     position: absolute;

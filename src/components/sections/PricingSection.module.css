@@ -1,40 +1,57 @@
 .section {
     position: relative;
     isolation: isolate;
-    overflow: hidden;
     padding-block: var(--space-20) var(--space-24);
-    background:
-        radial-gradient(ellipse at -25% 58%, rgb(119 37 14 / 24%), transparent 48%),
-        radial-gradient(ellipse at 115% 28%, rgb(0 81 142 / 24%), transparent 50%),
-        var(--color-bg);
+    --field-overlap: clamp(18rem, 28vw, 28rem);
 }
 
-.section::before,
-.section::after {
+/* This veil only blends the elevated mobile Results base into our dark base.
+   It occupies the handoff padding; the approved Results choreography is untouched. */
+.section::before {
     position: absolute;
-    z-index: -1;
-    width: 110%;
-    height: 52rem;
-    border: var(--border-width) solid transparent;
-    border-radius: 50%;
+    inset: -7rem 0 auto;
+    height: calc(7rem + 1px);
+    background: linear-gradient(to bottom, transparent, var(--color-bg) 98%);
     content: '';
     pointer-events: none;
 }
 
-.section::before {
-    top: 10%;
-    left: -60%;
-    border-top-color: rgb(227 73 22 / 19%);
-    box-shadow: 0 -1.5rem 4rem rgb(180 52 17 / 8%);
-    transform: rotate(24deg);
+.atmosphere {
+    position: absolute;
+    z-index: 0;
+    inset: calc(-1 * var(--field-overlap)) 0 -5rem;
+    overflow: hidden;
+    pointer-events: none;
+    mask-image: linear-gradient(to bottom, transparent, rgb(0 0 0 / 12%) 8%,
+        rgb(0 0 0 / 60%) 20%, #000 34%, #000 78%, transparent 100%);
 }
 
-.section::after {
-    top: 2%;
-    right: -67%;
-    border-top-color: rgb(18 109 164 / 23%);
-    box-shadow: 0 -1.5rem 4rem rgb(0 81 142 / 10%);
-    transform: rotate(-22deg);
+.fieldFallback,
+.fieldCanvas {
+    position: absolute;
+    inset: 0;
+}
+
+.fieldFallback {
+    background:
+        radial-gradient(ellipse 54% 38% at -8% 44%, rgb(125 40 17 / 23%), transparent 85%),
+        radial-gradient(ellipse 48% 40% at 104% 40%, rgb(17 73 130 / 27%), transparent 85%),
+        radial-gradient(ellipse 42% 26% at 75% 64%, rgb(35 28 79 / 13%), transparent 85%);
+}
+
+.fieldCanvas {
+    opacity: 0;
+    transition: opacity 800ms ease;
+}
+
+.fieldCanvas[data-ready='true'] {
+    opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fieldCanvas {
+        transition: none;
+    }
 }
 
 .content {
@@ -161,6 +178,10 @@
 }
 
 @media (min-width: 75rem) {
+    .section::before {
+        display: none;
+    }
+
     .section {
         padding-block: var(--space-32) 10rem;
     }
@@ -180,11 +201,74 @@
 }
 
 @media (forced-colors: active) {
+    .atmosphere,
+    .section::before {
+        display: none;
+    }
+
     .billing {
         border-color: CanvasText;
     }
 
     .activePeriod {
         outline: var(--border-width) solid Highlight;
+    }
+}
+
+.pricingStars {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.atmosphere[data-quality='reduced'] .pricingStars [data-depth] {
+    animation: none;
+}
+.pricingStars[data-visible='false'] [data-depth] {
+    animation-play-state: paused;
+}
+
+/* Pricing entrance clips the two existing heading lines without changing their text. */
+.heading span {
+    display: block;
+}
+
+.billing {
+    position: relative;
+    isolation: isolate;
+}
+
+.billingIndicator {
+    position: absolute;
+    z-index: 0;
+    inset: var(--space-1) auto var(--space-1) var(--space-1);
+    width: calc((100% - var(--space-2)) / 2);
+    border-radius: var(--radius-full);
+    background: color-mix(in srgb, var(--color-surface) 75%, var(--color-text-primary));
+    box-shadow: 0 1px 5px rgb(0 0 0 / 16%);
+    transition: transform 380ms var(--ease-out);
+}
+
+.billing[data-billing-period='yearly'] .billingIndicator {
+    transform: translateX(100%);
+}
+
+.billing button {
+    position: relative;
+    z-index: 1;
+    background: transparent;
+    transition: color var(--transition-base);
+}
+
+.billing .activePeriod {
+    background: transparent;
+    color: var(--color-text-primary);
+    cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .billingIndicator,
+    .billing button {
+        transition: none;
     }
 }

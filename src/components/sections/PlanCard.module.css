@@ -250,3 +250,152 @@
         color: Highlight;
     }
 }
+
+/* Relative top keeps hover lift independent of the scroll entrance transform. */
+.card {
+    position: relative;
+    isolation: isolate;
+    --pointer-x: 50%;
+    --pointer-y: 50%;
+    transition:
+        top 350ms var(--ease-out),
+        border-color 350ms var(--ease-out),
+        box-shadow 350ms var(--ease-out);
+}
+
+.card::before {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(circle 11rem at var(--pointer-x) var(--pointer-y),
+        rgb(138 65 255 / 21%), transparent 72%);
+    opacity: 0;
+    pointer-events: none;
+    content: '';
+    transition: opacity 350ms var(--ease-out);
+}
+
+.content {
+    position: relative;
+    z-index: 1;
+}
+
+.priceLine {
+    position: relative;
+}
+
+.priceStack {
+    display: grid;
+    align-items: baseline;
+    overflow: hidden;
+}
+
+.priceState {
+    grid-area: 1 / 1;
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    white-space: nowrap;
+    transition:
+        transform 350ms var(--ease-out),
+        opacity 250ms ease,
+        filter 350ms var(--ease-out);
+    transition-delay: var(--billing-delay, 0ms);
+}
+
+.card[data-plan-id='starter'] {
+    --billing-delay: 55ms;
+}
+
+.card[data-plan-id='business'] {
+    --billing-delay: 65ms;
+}
+
+.priceState[data-active='false'] {
+    opacity: 0;
+    filter: blur(3px);
+    pointer-events: none;
+}
+
+.priceState[data-active='false'][data-period='monthly'] {
+    transform: translateY(-75%);
+}
+
+.priceState[data-active='false'][data-period='yearly'] {
+    transform: translateY(75%);
+}
+
+.annualDetail {
+    position: absolute;
+    top: calc(100% + 2px);
+    left: 0;
+    color: var(--color-text-secondary);
+    font-size: 0.64rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateY(4px);
+    transition:
+        transform 280ms var(--ease-out),
+        opacity 280ms ease;
+    transition-delay: var(--billing-delay, 0ms);
+}
+
+.annualDetail[data-active='true'] {
+    opacity: 0.9;
+    transform: translateY(0);
+}
+
+@media (min-width: 48rem) and (hover: hover) and (pointer: fine) {
+    .card:hover {
+        top: -4px;
+        border-color: var(--color-border-hover);
+        box-shadow: 0 0 1.6rem rgb(138 65 255 / 16%);
+    }
+
+    .card:hover::before {
+        opacity: 1;
+    }
+
+    .featured:hover {
+        box-shadow: 0 0 2rem rgb(138 65 255 / 25%);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .card,
+    .card::before,
+    .priceState,
+    .annualDetail {
+        transition: none;
+    }
+
+    .card:hover {
+        top: 0;
+    }
+}
+
+@media (forced-colors: active) {
+    .card::before {
+        display: none;
+    }
+}
+.priceState .discount {
+    transform-origin: center;
+    transition:
+        transform 280ms var(--ease-out),
+        opacity 200ms ease;
+    transition-delay: calc(var(--billing-delay, 0ms) + 90ms);
+}
+
+.priceState[data-active='false'] .discount {
+    opacity: 0;
+    transform: translateY(5px) scale(0.85);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .priceState .discount {
+        transition: none;
+    }
+}
