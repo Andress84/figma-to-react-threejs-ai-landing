@@ -133,10 +133,10 @@ export function useFaqTransition(
           if (event.pointerType !== 'mouse') return
           const x = Math.max(-1, Math.min(1, event.clientX / window.innerWidth * 2 - 1))
           const y = Math.max(-1, Math.min(1, event.clientY / window.innerHeight * 2 - 1))
-          const starReach = [2.5, 5.5, 8]
+          const starReach = [4.5, 10, 17]
           starMoves.forEach((layer, index) => {
             layer.x(-x * starReach[index])
-            layer.y(-y * starReach[index] * 0.7)
+            layer.y(-y * starReach[index] * 0.78)
           })
           if (ringProgress() < 0.98) return
           ringMoves.forEach((ring, index) => {

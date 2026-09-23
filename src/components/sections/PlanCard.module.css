@@ -254,13 +254,14 @@
 /* Relative top keeps hover lift independent of the scroll entrance transform. */
 .card {
     position: relative;
+    top: 0;
     isolation: isolate;
     --pointer-x: 50%;
     --pointer-y: 50%;
     transition:
-        top 350ms var(--ease-out),
-        border-color 350ms var(--ease-out),
-        box-shadow 350ms var(--ease-out);
+            top 420ms var(--ease-out),
+            border-color 420ms var(--ease-out),
+            box-shadow 420ms var(--ease-out);
 }
 
 .card::before {

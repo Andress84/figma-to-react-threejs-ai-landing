@@ -80,7 +80,7 @@ export function SectionAtmosphere({ interactive }: { interactive: boolean }) {
 
     const pointerLayers = Array.from(field.querySelectorAll<HTMLElement>('[data-section-pointer-layer]'))
     const haze = field.querySelector<HTMLElement>('[data-section-haze]')
-    const reach = [2.5, 5.5, 9]
+    const reach = [4.5, 10.5, 18]
     let targetX = 0
     let targetY = 0
     let currentX = 0
@@ -95,10 +95,10 @@ export function SectionAtmosphere({ interactive }: { interactive: boolean }) {
       currentX += (targetX - currentX) * blend
       currentY += (targetY - currentY) * blend
       pointerLayers.forEach((layer, index) => {
-        layer.style.transform = `translate3d(${(-currentX * reach[index]).toFixed(2)}px, ${(-currentY * reach[index] * 0.7).toFixed(2)}px, 0)`
+        layer.style.transform = `translate3d(${(-currentX * reach[index]).toFixed(2)}px, ${(-currentY * reach[index] * 0.8).toFixed(2)}px, 0)`
       })
       if (haze) {
-        haze.style.transform = `translate3d(${(-currentX * 3.5).toFixed(2)}px, ${(-currentY * 2.5).toFixed(2)}px, 0)`
+        haze.style.transform = `translate3d(${(-currentX * 5).toFixed(2)}px, ${(-currentY * 3.8).toFixed(2)}px, 0)`
       }
       if (Math.abs(currentX - targetX) + Math.abs(currentY - targetY) > 0.004) {
         frame = requestAnimationFrame(render)

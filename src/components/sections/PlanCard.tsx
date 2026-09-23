@@ -1,7 +1,4 @@
-import { useEffect, useRef } from 'react'
-
 import type { Plan } from '../../data/plans'
-import { gsap } from '../../hooks/useGsap'
 import { ButtonLink } from '../ui/ButtonLink'
 import styles from './PlanCard.module.css'
 
@@ -10,47 +7,16 @@ export type BillingPeriod = 'monthly' | 'yearly'
 type PlanCardProps = {
   plan: Plan
   billingPeriod: BillingPeriod
-  interactive: boolean
 }
 
-export function PlanCard({ plan, billingPeriod, interactive }: PlanCardProps) {
-  const cardRef = useRef<HTMLLIElement>(null)
+export function PlanCard({ plan, billingPeriod }: PlanCardProps) {
   const active = billingPeriod === 'yearly' ? plan.yearly : plan
   const annualTotal = billingPeriod === 'yearly' ? plan.yearly.annualTotal : undefined
   const priceLabel = [active.price, active.billingPeriod, annualTotal, plan.discount]
     .filter(Boolean).join(' ')
 
-  useEffect(() => {
-    const card = cardRef.current
-    if (!interactive || !card) return
-    const hoverQuery = window.matchMedia('(min-width: 48rem) and (hover: hover) and (pointer: fine)')
-
-    const move = (event: PointerEvent) => {
-      if (!hoverQuery.matches || event.pointerType !== 'mouse') return
-      const bounds = card.getBoundingClientRect()
-      gsap.to(card, {
-        '--pointer-x': `${((event.clientX - bounds.left) / bounds.width * 100).toFixed(1)}%`,
-        '--pointer-y': `${((event.clientY - bounds.top) / bounds.height * 100).toFixed(1)}%`,
-        duration: 0.45, ease: 'power2.out', overwrite: 'auto',
-      })
-    }
-    const leave = () => {
-      gsap.to(card, { '--pointer-x': '50%', '--pointer-y': '50%',
-        duration: 0.55, ease: 'power2.out', overwrite: 'auto' })
-    }
-    card.addEventListener('pointermove', move, { passive: true })
-    card.addEventListener('pointerleave', leave)
-    return () => {
-      card.removeEventListener('pointermove', move)
-      card.removeEventListener('pointerleave', leave)
-      gsap.killTweensOf(card, '--pointer-x,--pointer-y')
-      card.style.removeProperty('--pointer-x')
-      card.style.removeProperty('--pointer-y')
-    }
-  }, [interactive])
-
   return (
-    <li ref={cardRef} data-pricing-card data-plan-id={plan.id}
+    <li data-pricing-card data-plan-id={plan.id}
       data-billing-period={billingPeriod}
       className={[styles.card, plan.featured && styles.featured].filter(Boolean).join(' ')}>
       <article className={styles.content} aria-labelledby={`${plan.id}-plan-title`}

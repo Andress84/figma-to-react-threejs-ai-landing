@@ -16,9 +16,9 @@ interface OrbitalMote {
 }
 
 const PROFILE_COUNTS: Record<WebGLQuality, number> = {
-  full: 34,
-  constrained: 18,
-  reduced: 10,
+  full: 80,
+  constrained: 32,
+  reduced: 12,
 }
 
 // Keep the deterministic motes in the same family as the seeded site starfields.

@@ -272,3 +272,9 @@
         transition: none;
     }
 }
+
+@media (min-width: 48rem) and (hover: hover) and (pointer: fine) {
+    .plans[data-glow-active='true'] [data-pricing-card]::before {
+        opacity: 1;
+    }
+}

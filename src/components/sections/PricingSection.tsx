@@ -12,10 +12,70 @@ import styles from './PricingSection.module.css'
 
 export function PricingSection() {
   const sectionRef = useRef<HTMLElement>(null)
+  const plansRef = useRef<HTMLUListElement>(null)
   const switchTimeline = useRef<gsap.core.Timeline | null>(null)
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('monthly')
   const profile = useWebGLPerformanceProfile()
   usePricingTransition(sectionRef, profile.quality)
+
+  useEffect(() => {
+    const group = plansRef.current
+    if (profile.quality !== 'full' || !group) return
+    const hoverQuery = window.matchMedia('(min-width: 48rem) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)')
+
+    const cards = Array.from(group.querySelectorAll<HTMLElement>('[data-pricing-card]'))
+    if (cards.length !== 3) return
+
+    // One pointer in viewport space lets every card reveal its portion of the same light.
+    const light = { x: 0, y: 0 }
+    const paint = () => {
+      const bounds = cards.map((card) => card.getBoundingClientRect())
+      cards.forEach((card, index) => {
+        card.style.setProperty('--pointer-x', `${(light.x - bounds[index].left).toFixed(1)}px`)
+        card.style.setProperty('--pointer-y', `${(light.y - bounds[index].top).toFixed(1)}px`)
+      })
+    }
+    const followX = gsap.quickTo(light, 'x', {
+      duration: 0.3, ease: 'power3.out', onUpdate: paint,
+    })
+    const followY = gsap.quickTo(light, 'y', {
+      duration: 0.3, ease: 'power3.out', onUpdate: paint,
+    })
+    const enter = (event: PointerEvent) => {
+      if (!hoverQuery.matches || event.pointerType !== 'mouse') return
+      light.x = event.clientX
+      light.y = event.clientY
+      paint()
+      group.dataset.glowActive = 'true'
+    }
+    const move = (event: PointerEvent) => {
+      if (!hoverQuery.matches || event.pointerType !== 'mouse') return
+      if (group.dataset.glowActive !== 'true') enter(event)
+      followX(event.clientX)
+      followY(event.clientY)
+    }
+    const leave = () => { group.dataset.glowActive = 'false' }
+    const mediaChange = () => { if (!hoverQuery.matches) leave() }
+
+    hoverQuery.addEventListener('change', mediaChange)
+    group.addEventListener('pointerenter', enter)
+    group.addEventListener('pointermove', move, { passive: true })
+    group.addEventListener('pointerleave', leave)
+    window.addEventListener('blur', leave)
+    return () => {
+      hoverQuery.removeEventListener('change', mediaChange)
+      group.removeEventListener('pointerenter', enter)
+      group.removeEventListener('pointermove', move)
+      group.removeEventListener('pointerleave', leave)
+      window.removeEventListener('blur', leave)
+      gsap.killTweensOf(light)
+      group.removeAttribute('data-glow-active')
+      cards.forEach((card) => {
+        card.style.removeProperty('--pointer-x')
+        card.style.removeProperty('--pointer-y')
+      })
+    }
+  }, [profile.quality])
 
   useEffect(() => () => {
     switchTimeline.current?.kill()
@@ -76,10 +136,9 @@ export function PricingSection() {
           </button>
         </div>
 
-        <ul className={styles.plans}>
+        <ul ref={plansRef} className={styles.plans}>
           {plans.map((plan) => (
-            <PlanCard key={plan.id} plan={plan} billingPeriod={billingPeriod}
-              interactive={profile.quality === 'full'} />
+            <PlanCard key={plan.id} plan={plan} billingPeriod={billingPeriod} />
           ))}
         </ul>
       </Container>

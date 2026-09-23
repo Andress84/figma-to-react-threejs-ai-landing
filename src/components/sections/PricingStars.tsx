@@ -88,7 +88,7 @@ export function PricingStars({ fieldRef, quality, visible }: PricingStarsProps) 
       || !window.matchMedia('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)').matches) return
 
     const pointerLayers = Array.from(stars.querySelectorAll<HTMLElement>('[data-pricing-star-layer]'))
-    const reach = [2.5, 5.5, 9]
+    const reach = [4.5, 10, 17]
     let targetX = 0
     let targetY = 0
     let currentX = 0
@@ -108,7 +108,7 @@ export function PricingStars({ fieldRef, quality, visible }: PricingStarsProps) 
       currentX += (targetX - currentX) * blend
       currentY += (targetY - currentY) * blend
       pointerLayers.forEach((layer, index) => {
-        layer.style.transform = `translate3d(${(-currentX * reach[index]).toFixed(2)}px, ${(-currentY * reach[index] * 0.7).toFixed(2)}px, 0)`
+        layer.style.transform = `translate3d(${(-currentX * reach[index]).toFixed(2)}px, ${(-currentY * reach[index] * 0.78).toFixed(2)}px, 0)`
       })
       if (Math.abs(targetX) + Math.abs(targetY) + Math.abs(currentX) + Math.abs(currentY) > 0.004) {
         frame = requestAnimationFrame(render)

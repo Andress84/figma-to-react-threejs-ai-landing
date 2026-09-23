@@ -36,25 +36,53 @@
     background: transparent;
     color: var(--color-text-primary);
     cursor: pointer;
+    transition: color 240ms ease, transform 220ms ease;
 }
 
-.menuTrigger svg {
+.menuTrigger:active {
+    transform: scale(0.93);
+}
+
+.menuIcon {
+    position: relative;
+    display: block;
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.lineTop,
+.lineMiddle,
+.lineBottom {
+    position: absolute;
+    left: 0;
     width: 100%;
-    height: 100%;
+    height: 2px;
+    border-radius: var(--radius-full);
+    background: currentColor;
+    transform-origin: 50% 50%;
+    transition: transform 380ms cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 260ms ease;
+}
+
+.lineTop { top: 5px; }
+.lineMiddle { top: 11px; left: auto; right: 0; width: 70%; }
+.lineBottom { top: 17px; }
+
+.menuTrigger[data-open='true'] .lineTop {
+    transform: translateY(6px) rotate(45deg);
+}
+
+.menuTrigger[data-open='true'] .lineMiddle {
+    transform: scaleX(0);
+    opacity: 0;
+}
+
+.menuTrigger[data-open='true'] .lineBottom {
+    transform: translateY(-6px) rotate(-45deg);
 }
 
 .navigation {
     display: none;
-    position: absolute;
-    inset: 100% 0 auto;
-    padding: var(--space-5) var(--container-padding) var(--space-6);
-    border-bottom: var(--border-subtle);
-    background: var(--color-bg-elevated);
-}
-
-.navigation[data-open='true'] {
-    display: grid;
-    gap: var(--space-5);
 }
 
 .links {
@@ -83,7 +111,7 @@
     position: absolute;
     top: var(--space-2);
     left: var(--container-padding);
-    z-index: 2;
+    z-index: 30;
     padding: var(--space-3) var(--space-4);
     transform: translateY(calc(-100% - var(--space-4)));
     border-radius: var(--radius-sm);
@@ -93,6 +121,154 @@
 
 .skipLink:focus {
     transform: translateY(0);
+}
+
+.mobileBackdrop,
+.mobileNavigation {
+    display: none;
+}
+
+@media (max-width: 47.999rem) {
+    .header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: rgb(7 7 10 / 90%);
+        backdrop-filter: blur(14px);
+    }
+
+    .header[data-menu-visible='true'] {
+        border-color: transparent;
+        background: transparent;
+        backdrop-filter: none;
+    }
+
+    .logo,
+    .menuTrigger {
+        position: relative;
+        z-index: 22;
+    }
+
+    .mobileBackdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 20;
+        display: block;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        border: 0;
+        background: #000;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    .mobileBackdrop[data-visible='true'] {
+        visibility: visible;
+        pointer-events: auto;
+    }
+
+    .mobileNavigation {
+        position: fixed;
+        inset: max(0.625rem, env(safe-area-inset-top)) 0.625rem
+            max(0.625rem, env(safe-area-inset-bottom));
+        z-index: 21;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        padding: clamp(5.5rem, 12dvh, 7rem) var(--space-6) var(--space-6);
+        overflow-x: hidden;
+        overflow-y: hidden;
+        border: 1px solid rgb(168 103 255 / 26%);
+        border-radius: 1.5rem;
+        background:
+            radial-gradient(ellipse at 92% 4%, var(--color-primary-subtle), transparent 43%),
+            #111116;
+        box-shadow: 0 2rem 5rem rgb(0 0 0 / 68%);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transform-origin: 92% 0%;
+    }
+
+    .mobileNavigation[data-visible='true'] {
+        visibility: visible;
+        pointer-events: auto;
+        will-change: transform, clip-path, opacity;
+    }
+
+    .mobileLinks {
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: column;
+        justify-content: safe center;
+        gap: clamp(0.35rem, 1.5dvh, 0.8rem);
+        min-height: 0;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    .mobileLinks li {
+        flex: none;
+    }
+
+    .mobileLinks li,
+    .mobileLoginWrap {
+        overflow: hidden;
+    }
+
+    .mobileNavLink {
+        display: block;
+        width: fit-content;
+        min-height: 3.25rem;
+        padding-block: 0.28rem;
+        color: var(--color-text-primary);
+        font-size: clamp(2.1rem, 9vw, 3.35rem);
+        font-weight: var(--font-weight-semibold);
+        letter-spacing: -0.055em;
+        line-height: 1.08;
+        transition: color 220ms ease;
+    }
+
+    .mobileNavLink[aria-current='page'] {
+        color: var(--color-text-accent);
+    }
+
+    .mobileLoginWrap {
+        flex: 0 0 auto;
+        padding-top: var(--space-5);
+        border-top: var(--border-subtle);
+    }
+
+    .mobileLogin {
+        width: 100%;
+        min-height: 3.25rem;
+        font-size: var(--font-size-base);
+    }
+
+    .menuTrigger:focus-visible,
+    .mobileNavLink:focus-visible,
+    .mobileLogin:focus-visible {
+        outline: 2px solid var(--color-primary-light);
+        outline-offset: 4px;
+    }
+}
+
+@media (max-width: 47.999rem) and (max-height: 36rem) {
+    .mobileNavigation {
+        padding-top: 4.75rem;
+        padding-bottom: var(--space-4);
+    }
+
+    .mobileLinks {
+        gap: 0.1rem;
+    }
+
+    .mobileNavLink {
+        min-height: 2.75rem;
+        font-size: clamp(1.85rem, 8vw, 2.5rem);
+    }
 }
 
 @media (min-width: 48rem) {
@@ -108,8 +284,7 @@
         display: none;
     }
 
-    .navigation,
-    .navigation[data-open='true'] {
+    .navigation {
         display: flex;
         position: static;
         flex: 1;
@@ -147,8 +322,7 @@
         width: 4.375rem;
     }
 
-    .navigation,
-    .navigation[data-open='true'] {
+    .navigation {
         margin-left: clamp(4rem, calc(70vw - 48rem), 13rem);
     }
 
@@ -179,11 +353,27 @@
 }
 
 @media (hover: hover) {
-    .navLink:hover {
+    .navLink:hover,
+    .mobileNavLink:hover {
         color: var(--color-text-primary);
     }
 
     .menuTrigger:hover {
         color: var(--color-text-accent);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .menuTrigger,
+    .lineTop,
+    .lineMiddle,
+    .lineBottom,
+    .mobileNavLink {
+        transition-duration: 120ms;
+    }
+}
+@media (max-width: 20rem) {
+    :global(html body) {
+        min-width: 0;
     }
 }

@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useLenis } from 'lenis/react'
 
 import logo from '../../assets/w-logo-placeholder.svg'
+import { gsap } from '../../hooks/useGsap'
 import { ButtonLink } from '../ui/ButtonLink'
 import { Container } from '../ui/Container'
 import styles from './SiteHeader.module.css'
 
-// Future-section and account destinations are reserved for the full landing page.
 const navigation = [
   { label: 'Home', href: '#home' },
   { label: 'Product', href: '#product' },
@@ -13,89 +14,271 @@ const navigation = [
   { label: 'Pricing', href: '#pricing' },
 ]
 
+type CloseReason = 'toggle' | 'escape' | 'link' | 'backdrop'
+
 export function SiteHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isPanelVisible, setIsPanelVisible] = useState(false)
+  const isOpenRef = useRef(false)
+  const pendingHrefRef = useRef<string | null>(null)
+  const restoreFocusRef = useRef(false)
   const menuTriggerRef = useRef<HTMLButtonElement>(null)
-  const headerRef = useRef<HTMLElement>(null)
+  const logoRef = useRef<HTMLAnchorElement>(null)
   const homeLinkRef = useRef<HTMLAnchorElement>(null)
-  const navigationRef = useRef<HTMLElement>(null)
+  const mobileNavigationRef = useRef<HTMLElement>(null)
+  const backdropRef = useRef<HTMLButtonElement>(null)
+  const timelineRef = useRef<gsap.core.Timeline | null>(null)
+  const lenis = useLenis()
 
-  useEffect(() => {
-    const tabletViewport = window.matchMedia('(min-width: 48rem)')
+  const openMenu = useCallback(() => {
+    if (isOpenRef.current) return
+    isOpenRef.current = true
+    pendingHrefRef.current = null
+    restoreFocusRef.current = false
+    setIsPanelVisible(true)
+    setIsMenuOpen(true)
+    timelineRef.current?.play()
+  }, [])
 
-    function handleViewportChange(event: MediaQueryListEvent) {
-      // Keep keyboard focus on a visible control when the navigation changes layout.
-      if (event.matches && document.activeElement === menuTriggerRef.current) {
-        homeLinkRef.current?.focus()
-      } else if (!event.matches && navigationRef.current?.contains(document.activeElement)) {
-        menuTriggerRef.current?.focus()
-      }
-      setIsMenuOpen(false)
-    }
-
-    tabletViewport.addEventListener('change', handleViewportChange)
-    return () => tabletViewport.removeEventListener('change', handleViewportChange)
+  const closeMenu = useCallback((reason: CloseReason, href?: string) => {
+    if (!isOpenRef.current) return
+    isOpenRef.current = false
+    pendingHrefRef.current = reason === 'link' ? href ?? null : null
+    restoreFocusRef.current = reason !== 'link'
+    setIsMenuOpen(false)
+    if (timelineRef.current) timelineRef.current.reverse()
+    else setIsPanelVisible(false)
   }, [])
 
   useEffect(() => {
-    if (!isMenuOpen) return
+    const panel = mobileNavigationRef.current
+    const backdrop = backdropRef.current
+    if (!panel || !backdrop) return
 
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        event.preventDefault()
+    const items = Array.from(panel.querySelectorAll<HTMLElement>('[data-mobile-menu-item]'))
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const timeline = gsap.timeline({
+      paused: true,
+      onReverseComplete: () => setIsPanelVisible(false),
+    })
+
+    if (reduceMotion) {
+      timeline
+        .fromTo(backdrop, { opacity: 0 }, { opacity: 0.35, duration: 0.12 }, 0)
+        .fromTo(panel, { opacity: 0 }, { opacity: 1, duration: 0.12 }, 0)
+        .fromTo(items, { opacity: 0 }, { opacity: 1, duration: 0.12 }, 0)
+    } else {
+      timeline
+        .fromTo(backdrop, { opacity: 0 }, {
+          opacity: 0.42, duration: 0.46, ease: 'power2.out',
+        }, 0)
+        .fromTo(panel, {
+          clipPath: 'inset(0 0 94% 70% round 1.5rem)',
+          y: -18,
+          scale: 0.975,
+          opacity: 0.94,
+        }, {
+          clipPath: 'inset(0 0 0% 0% round 1.5rem)',
+          y: 0,
+          scale: 1,
+          opacity: 1,
+          duration: 0.72,
+          ease: 'power3.out',
+        }, 0)
+        .fromTo(items, {
+          y: 34,
+          opacity: 0,
+          filter: 'blur(3px)',
+        }, {
+          y: 0,
+          opacity: 1,
+          filter: 'blur(0px)',
+          duration: 0.48,
+          stagger: 0.065,
+          ease: 'power3.out',
+        }, 0.22)
+        .call(() => {
+          if (isOpenRef.current && document.activeElement === menuTriggerRef.current) {
+            panel.querySelector<HTMLAnchorElement>('a')?.focus()
+          }
+        }, [], 0.43)
+    }
+    timelineRef.current = timeline
+
+    const tabletViewport = window.matchMedia('(min-width: 48rem)')
+    const handleViewportChange = (event: MediaQueryListEvent) => {
+      if (event.matches) {
+        if (
+          mobileNavigationRef.current?.contains(document.activeElement)
+          || document.activeElement === menuTriggerRef.current
+        ) {
+          homeLinkRef.current?.focus()
+        }
+        isOpenRef.current = false
+        pendingHrefRef.current = null
+        restoreFocusRef.current = false
         setIsMenuOpen(false)
+        setIsPanelVisible(false)
+        timeline.pause(0)
+      } else if (document.activeElement && homeLinkRef.current === document.activeElement) {
         menuTriggerRef.current?.focus()
       }
     }
+    tabletViewport.addEventListener('change', handleViewportChange)
 
-    function handlePointerDown(event: PointerEvent) {
-      if (event.target instanceof Node && !headerRef.current?.contains(event.target)) {
-        setIsMenuOpen(false)
-        // Do not leave focus in the now-hidden panel on a non-focusable click.
-        if (headerRef.current?.contains(document.activeElement)) {
-          menuTriggerRef.current?.focus()
-        }
+    return () => {
+      tabletViewport.removeEventListener('change', handleViewportChange)
+      timeline.kill()
+      timelineRef.current = null
+      gsap.set([panel, backdrop, ...items], { clearProps: 'all' })
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!isPanelVisible) return
+
+    const root = document.documentElement
+    const body = document.body
+    const main = document.querySelector<HTMLElement>('main')
+    const footer = document.querySelector<HTMLElement>('footer')
+    const originalRootOverflow = root.style.overflow
+    const originalBodyOverflow = body.style.overflow
+    const mainWasInert = main?.inert ?? false
+    const footerWasInert = footer?.inert ?? false
+    const lenisWasStopped = lenis?.isStopped ?? false
+
+    const preventPageScroll = (event: Event) => {
+      if (event.target instanceof Node && mobileNavigationRef.current?.contains(event.target)) {
+        return
+      }
+      event.preventDefault()
+    }
+    const preventScrollKeys = (event: KeyboardEvent) => {
+      if (['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' ']
+        .includes(event.key)) {
+        event.preventDefault()
       }
     }
 
-    document.addEventListener('keydown', handleKeyDown)
-    document.addEventListener('pointerdown', handlePointerDown)
+    lenis?.stop()
+    // Lenis's stopped class clips the root; keep it visible so the sticky header stays in view.
+    root.style.overflow = 'visible'
+    body.style.overflow = 'visible'
+    if (main) main.inert = true
+    if (footer) footer.inert = true
+    document.addEventListener('wheel', preventPageScroll, { passive: false })
+    document.addEventListener('touchmove', preventPageScroll, { passive: false })
+    document.addEventListener('keydown', preventScrollKeys)
 
     return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-      document.removeEventListener('pointerdown', handlePointerDown)
+      document.removeEventListener('wheel', preventPageScroll)
+      document.removeEventListener('touchmove', preventPageScroll)
+      document.removeEventListener('keydown', preventScrollKeys)
+      root.style.overflow = originalRootOverflow
+      body.style.overflow = originalBodyOverflow
+      if (main) main.inert = mainWasInert
+      if (footer) footer.inert = footerWasInert
+      if (!lenisWasStopped) lenis?.start()
     }
-  }, [isMenuOpen])
+  }, [isPanelVisible, lenis])
 
-  function closeMenu() {
-    if (isMenuOpen) {
-      setIsMenuOpen(false)
-      menuTriggerRef.current?.focus()
+  useEffect(() => {
+    if (isPanelVisible) return
+    const href = pendingHrefRef.current
+    pendingHrefRef.current = null
+    if (href) {
+      const target = document.getElementById(href.slice(1))
+      if (window.location.hash !== href) window.location.hash = href
+      else target?.scrollIntoView({ behavior: 'smooth' })
+      if (target) {
+        const hadTabIndex = target.hasAttribute('tabindex')
+        target.tabIndex = -1
+        target.focus({ preventScroll: true })
+        if (!hadTabIndex) {
+          target.addEventListener('blur', () => target.removeAttribute('tabindex'), { once: true })
+        }
+      } else {
+        menuTriggerRef.current?.focus({ preventScroll: true })
+      }
+    } else if (restoreFocusRef.current) {
+      menuTriggerRef.current?.focus({ preventScroll: true })
+    }
+    restoreFocusRef.current = false
+  }, [isPanelVisible])
+
+  useEffect(() => {
+    if (!isPanelVisible) return
+
+    const focusables = (): HTMLElement[] => {
+      const elements: Array<HTMLElement | null> = [
+        logoRef.current,
+        menuTriggerRef.current,
+        ...Array.from(mobileNavigationRef.current?.querySelectorAll<HTMLAnchorElement>('a') ?? []),
+      ]
+      return elements.filter((element): element is HTMLElement => element !== null)
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        closeMenu('escape')
+        menuTriggerRef.current?.focus({ preventScroll: true })
+      } else if (event.key === 'Tab') {
+        const elements = focusables()
+        const first = elements[0]
+        const last = elements[elements.length - 1]
+        if (!first || !last) return
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault()
+          last.focus()
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault()
+          first.focus()
+        } else if (!elements.includes(document.activeElement as HTMLElement)) {
+          event.preventDefault()
+          first.focus()
+        }
+      }
+    }
+    const handleFocusIn = (event: FocusEvent) => {
+      if (
+        event.target instanceof Node
+        && !logoRef.current?.contains(event.target)
+        && !menuTriggerRef.current?.contains(event.target)
+        && !mobileNavigationRef.current?.contains(event.target)
+      ) {
+        mobileNavigationRef.current?.querySelector<HTMLAnchorElement>('a')?.focus()
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    document.addEventListener('focusin', handleFocusIn)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      document.removeEventListener('focusin', handleFocusIn)
+    }
+  }, [isPanelVisible, closeMenu])
+
+  const handleMenuLink = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    event.preventDefault()
+    closeMenu('link', href)
+  }
+
+  const handleHeaderLink = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (isOpenRef.current) {
+      event.preventDefault()
+      closeMenu('link', href)
     }
   }
 
   return (
-    <header
-      className={styles.header}
-      ref={headerRef}
-      onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) {
-          setIsMenuOpen(false)
-          // Browsers can blur a newly hidden link before the media-query event fires.
-          if (
-            navigationRef.current?.contains(event.target) &&
-            event.target.getClientRects().length === 0
-          ) {
-            menuTriggerRef.current?.focus()
-          }
-        }
-      }}
-    >
-      <a className={styles.skipLink} href="#main-content" onClick={closeMenu}>
+    <header className={styles.header} data-menu-visible={isPanelVisible}>
+      <a className={styles.skipLink} href="#main-content"
+        onClick={(event) => handleHeaderLink(event, '#main-content')}>
         Skip to content
       </a>
       <Container className={styles.inner}>
-        <a className={styles.logo} href="#home" aria-label="W home" onClick={closeMenu}>
+        <a ref={logoRef} className={styles.logo} href="#home" aria-label="W home"
+          onClick={(event) => handleHeaderLink(event, '#home')}>
           <img src={logo} width="72" height="50" alt="" />
         </a>
 
@@ -105,25 +288,18 @@ export function SiteHeader() {
           type="button"
           aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
           aria-expanded={isMenuOpen}
-          aria-controls="site-navigation"
-          onClick={() => setIsMenuOpen((open) => !open)}
+          aria-controls="site-mobile-navigation"
+          data-open={isMenuOpen}
+          onClick={() => isOpenRef.current ? closeMenu('toggle') : openMenu()}
         >
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
-            <path
-              d={isMenuOpen ? 'm5 5 14 14M19 5 5 19' : 'M2 5h20M8 12h14M2 19h20'}
-              stroke="currentColor"
-              strokeWidth="2"
-            />
-          </svg>
+          <span className={styles.menuIcon} aria-hidden="true">
+            <span className={styles.lineTop} />
+            <span className={styles.lineMiddle} />
+            <span className={styles.lineBottom} />
+          </span>
         </button>
 
-        <nav
-          ref={navigationRef}
-          id="site-navigation"
-          aria-label="Main navigation"
-          className={styles.navigation}
-          data-open={isMenuOpen}
-        >
+        <nav id="site-navigation" aria-label="Main navigation" className={styles.navigation}>
           <ul className={styles.links}>
             {navigation.map(({ label, href }, index) => (
               <li key={href}>
@@ -132,16 +308,54 @@ export function SiteHeader() {
                   className={styles.navLink}
                   href={href}
                   aria-current={index === 0 ? 'page' : undefined}
-                  onClick={closeMenu}
                 >
                   {label}
                 </a>
               </li>
             ))}
           </ul>
-          <ButtonLink className={styles.login} href="#login" onClick={closeMenu}>
-            Login
-          </ButtonLink>
+          <ButtonLink className={styles.login} href="#login">Login</ButtonLink>
+        </nav>
+
+        <button
+          ref={backdropRef}
+          className={styles.mobileBackdrop}
+          data-visible={isPanelVisible}
+          type="button"
+          tabIndex={-1}
+          aria-hidden="true"
+          onClick={() => closeMenu('backdrop')}
+        />
+        <nav
+          ref={mobileNavigationRef}
+          id="site-mobile-navigation"
+          aria-label="Mobile navigation"
+          className={styles.mobileNavigation}
+          data-visible={isPanelVisible}
+          aria-hidden={!isPanelVisible}
+          inert={!isPanelVisible}
+        >
+          <ul className={styles.mobileLinks}>
+            {navigation.map(({ label, href }, index) => (
+              <li key={href}>
+                <a
+                  className={styles.mobileNavLink}
+                  href={href}
+                  aria-current={index === 0 ? 'page' : undefined}
+                  data-mobile-menu-item
+                  onClick={(event) => handleMenuLink(event, href)}
+                >
+                  {label}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <div className={styles.mobileLoginWrap}>
+            <ButtonLink className={styles.mobileLogin} href="#login"
+              data-mobile-menu-item onClick={(event) => handleMenuLink(event, '#login')}>
+              Login
+            </ButtonLink>
+          </div>
         </nav>
       </Container>
     </header>

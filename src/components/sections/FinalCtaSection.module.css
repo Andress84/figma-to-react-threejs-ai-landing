@@ -176,12 +176,12 @@
 }
 
 .orbitAnchor {
-    --orbit-base-radius: 7.04rem;
+    --orbit-base-radius: 7.92rem;
     position: absolute;
-    top: 0.5rem;
+    top: -5.75rem;
     left: 50%;
-    width: 16rem;
-    height: 16rem;
+    width: 18rem;
+    height: 18rem;
     perspective: 900px;
     transform: translateX(-50%) rotateX(11deg);
     mask-image: linear-gradient(
@@ -334,25 +334,28 @@
 
 @media (min-width: 48rem) {
     .orbitAnchor {
-        --orbit-base-radius: 8.36rem;
-        width: 19rem;
-        height: 19rem;
+        --orbit-base-radius: 10.56rem;
+        top: -8.25rem;
+        width: 24rem;
+        height: 24rem;
     }
 }
 
 @media (min-width: 75rem) {
     .orbitAnchor {
-        --orbit-base-radius: 9.24rem;
-        width: 21rem;
-        height: 21rem;
+        --orbit-base-radius: 13.2rem;
+        top: -15.5rem;
+        width: 30rem;
+        height: 30rem;
     }
 }
 
 @media (max-width: 47.999rem) {
     .orbitAnchor {
-        --orbit-base-radius: 7.04rem;
-        width: 16rem;
-        height: 16rem;
+        --orbit-base-radius: 7.92rem;
+        top: -5.75rem;
+        width: 18rem;
+        height: 18rem;
     }
 
     .orbitMote:nth-of-type(n + 13) {
