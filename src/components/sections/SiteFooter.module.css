@@ -1,8 +1,12 @@
 .footer {
+    position: relative;
+    isolation: isolate;
     background: var(--color-bg);
 }
 
 .inner {
+    position: relative;
+    z-index: 1;
     padding-top: var(--space-16);
     padding-bottom: var(--space-20);
 }

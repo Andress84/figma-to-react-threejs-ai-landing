@@ -8,6 +8,11 @@
         linear-gradient(to bottom, var(--color-bg), var(--color-bg-elevated) 12rem);
 }
 
+.content {
+    position: relative;
+    z-index: 1;
+}
+
 .intro {
     display: grid;
 }

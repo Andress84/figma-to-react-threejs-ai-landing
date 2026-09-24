@@ -11,6 +11,7 @@ import { ResultsSection } from './components/sections/ResultsSection'
 import { SectionAtmosphere } from './components/sections/SectionAtmosphere'
 import { SiteHeader } from './components/sections/SiteHeader'
 import { SiteFooter } from './components/sections/SiteFooter'
+import { GlobalCursor } from './components/ui/GlobalCursor'
 import type { FeatureCrossMotion } from './components/three/FeatureCross'
 import { useWebGLPerformanceProfile } from './components/three/useWebGLPerformanceProfile'
 import { useHeroFeaturesTransition } from './hooks/useHeroFeaturesTransition'
@@ -45,6 +46,7 @@ function App() {
         </div>
       </main>
       <SiteFooter />
+      <GlobalCursor />
     </>
   )
 }

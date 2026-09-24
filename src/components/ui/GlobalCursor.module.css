@@ -1,0 +1,68 @@
+.indicator {
+    position: fixed;
+    z-index: 2147483646;
+    top: 0;
+    left: 0;
+    width: 6rem;
+    height: 6rem;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(-10rem, -10rem, 0);
+    transition: opacity 160ms ease;
+    will-change: transform;
+}
+
+.indicator[data-visible='true'] {
+    opacity: 1;
+}
+
+.dot,
+.halo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    border-radius: 50%;
+    pointer-events: none;
+    transform-origin: center;
+}
+
+.dot {
+    width: 0.55rem;
+    height: 0.55rem;
+    margin: -0.275rem 0 0 -0.275rem;
+    background: #f7f0ff;
+    box-shadow: 0 0 0 1px rgb(18 10 30 / 55%), 0 0 0.65rem rgb(166 114 244 / 55%);
+}
+
+.halo {
+    width: 6rem;
+    height: 6rem;
+    margin: -3rem 0 0 -3rem;
+    border: 1px solid rgb(248 244 255 / 44%);
+    background: rgb(247 240 255 / 12%);
+    box-shadow: inset 0 0 1.4rem rgb(255 255 255 / 7%),
+        0 0 1.6rem rgb(173 118 247 / 13%);
+    opacity: 0;
+    transform: scale(0.13);
+}
+
+.fluidField {
+    position: fixed;
+    z-index: 4;
+    top: 0;
+    left: 0;
+    display: block;
+    max-width: none;
+    visibility: hidden;
+    pointer-events: none;
+    /* Foreground objects are excluded by the compositor's glyph/surface mask.
+       No section opacity, overflow, containment or gradient affects this plane. */
+}
+
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce),
+    (forced-colors: active) {
+    .indicator,
+    .fluidField {
+        display: none;
+    }
+}

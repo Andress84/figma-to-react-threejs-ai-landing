@@ -32,7 +32,7 @@ export function FeaturesSection({ motionRef, interactive }: {
       aria-labelledby="features-heading"
       data-scroll-features
     >
-      <Container>
+      <Container className={styles.content}>
         <div className={styles.intro}>
           <header className={styles.header}>
             <h2 id="features-heading" className={styles.heading}>

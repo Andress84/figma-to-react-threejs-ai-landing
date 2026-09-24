@@ -11,7 +11,7 @@ export function ResultsSection() {
       className={styles.section}
       aria-labelledby="results-heading"
     >
-      <Container>
+      <Container className={styles.content}>
         <div className={styles.intro}>
           <p className={styles.year} data-results-year>2026</p>
           <div className={styles.copy}>
