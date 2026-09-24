@@ -15,7 +15,7 @@ const options = {
   wheelMultiplier: 0.85,
 }
 
-function LenisGsapBridge() {
+function LenisGsapBridge({ locked }: { locked: boolean }) {
   const lenis = useLenis()
   useEffect(() => {
     if (!lenis) return
@@ -31,13 +31,19 @@ function LenisGsapBridge() {
     }
   }, [lenis])
 
+  useEffect(() => {
+    if (!lenis) return
+    if (locked) lenis.stop()
+    else lenis.start()
+  }, [lenis, locked])
+
   return null
 }
 
-export function SmoothScroll({ enabled }: { enabled: boolean }) {
+export function SmoothScroll({ enabled, locked }: { enabled: boolean; locked: boolean }) {
   return enabled ? (
     <ReactLenis root options={options}>
-      <LenisGsapBridge />
+      <LenisGsapBridge locked={locked} />
     </ReactLenis>
   ) : null
 }

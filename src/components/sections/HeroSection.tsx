@@ -12,7 +12,7 @@ const HeroBackgroundSceneV2 = lazy(
   () => import('../three/heroV2/HeroBackgroundSceneV2'),
 )
 
-export function HeroSection() {
+export function HeroSection({ onSceneReady }: { onSceneReady: () => void }) {
   const heroRef = useRef<HTMLElement>(null)
   const [backgroundVariant] = useState(getHeroBackgroundVariant)
   const Background = backgroundVariant === 'v2' ? HeroBackgroundSceneV2 : HeroBackgroundScene
@@ -29,7 +29,7 @@ export function HeroSection() {
         <div className={styles.backdrop} data-scroll-atmosphere-backdrop />
         <div className={styles.sceneLayer} data-scroll-atmosphere-scene>
           <Suspense fallback={null}>
-            <Background pointerTargetRef={heroRef} />
+            <Background pointerTargetRef={heroRef} onSceneReady={onSceneReady} />
           </Suspense>
         </div>
       </div>

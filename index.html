@@ -5,9 +5,47 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>figma-to-react-threejs-ai-landing</title>
+    <style>
+      #site-preloader-root { display: none; }
+      html[data-site-opening] { overflow: hidden; scrollbar-gutter: stable; }
+      html[data-site-opening] #site-preloader-root,
+      html[data-site-opening] #site-preloader-root * { cursor: default !important; }
+      html[data-site-opening] #site-preloader-root {
+        position: fixed; z-index: 200; inset: 0; display: block;
+        overflow: hidden; background: #030307; cursor: default !important;
+      }
+      html[data-site-opening] #site-preloader-root[data-bound='true'] { background: transparent; }
+      html[data-site-opening] #site-preloader-root::after {
+        position: absolute; top: 50%; left: 50%; width: 5px; height: 5px;
+        border-radius: 50%; background: #f8f5ff;
+        box-shadow: 0 0 12px 4px #a588e877, 0 0 48px 12px #7855bd33;
+        transform: translate(-50%, -50%); content: '';
+      }
+      html[data-site-opening] #site-preloader-root[data-bound='true']::after { display: none; }
+      html[data-site-opening] #root > header,
+      html[data-site-opening] [data-scroll-hero-content] { transition: opacity 440ms ease; }
+      html:is([data-site-opening='loading'], [data-site-opening='revealing']) #root > header,
+      html:is([data-site-opening='loading'], [data-site-opening='revealing'],
+        [data-site-opening='header']) [data-scroll-hero-content] { opacity: 0 !important; }
+      @media (prefers-reduced-motion: reduce) {
+        html[data-site-opening] #root > header,
+        html[data-site-opening] [data-scroll-hero-content] { transition-duration: 110ms; }
+      }
+    </style>
+    <script>
+      if ((!location.hash || location.hash === '#home') &&
+        performance.getEntriesByType('navigation')[0]?.type !== 'back_forward') {
+        document.documentElement.dataset.siteOpening = 'loading';
+        window.__sitePreloaderSafety = setTimeout(() => {
+          document.documentElement.removeAttribute('data-site-opening');
+          document.getElementById('site-preloader-root')?.remove();
+        }, 8000);
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
+    <div id="site-preloader-root" role="status" aria-label="Opening site"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

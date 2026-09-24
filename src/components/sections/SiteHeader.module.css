@@ -291,17 +291,21 @@
         position: static;
         flex: 1;
         align-items: center;
-        justify-content: space-between;
+        justify-content: flex-end;
         gap: var(--space-6);
-        margin-left: clamp(3.5rem, 8.3vw, 5rem);
+        margin-left: 0;
         padding: 0;
         border: 0;
         background: transparent;
     }
 
     .links {
+        position: absolute;
+        left: 50%;
         flex-direction: row;
         gap: clamp(1.5rem, 4.2vw, 4rem);
+        transform: translateX(-50%);
+        white-space: nowrap;
     }
 
     .login {
@@ -322,10 +326,6 @@
 
     .logo img {
         width: 4.375rem;
-    }
-
-    .navigation {
-        margin-left: clamp(4rem, calc(70vw - 48rem), 13rem);
     }
 
     .links {

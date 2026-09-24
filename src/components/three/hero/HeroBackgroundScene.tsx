@@ -7,10 +7,12 @@ import styles from './HeroBackgroundScene.module.css'
 
 interface HeroBackgroundSceneProps {
   pointerTargetRef: RefObject<HTMLElement | null>
+  onSceneReady: () => void
 }
 
 export default function HeroBackgroundScene({
   pointerTargetRef,
+  onSceneReady,
 }: HeroBackgroundSceneProps) {
   const profile = useWebGLPerformanceProfile()
 
@@ -42,7 +44,12 @@ export default function HeroBackgroundScene({
           powerPreference:
             profile.quality === 'full' ? 'high-performance' : 'low-power',
         }}
-        onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
+        onCreated={({ gl }) => {
+          gl.setClearColor(0x000000, 0)
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            if (gl.domElement.isConnected) onSceneReady()
+          }))
+        }}
         resize={{ debounce: { resize: 100, scroll: 0 }, scroll: false }}
       >
         <HeroScene pointerTargetRef={pointerTargetRef} profile={profile} />

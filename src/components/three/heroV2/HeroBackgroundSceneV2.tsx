@@ -8,9 +8,10 @@ import { V2_CAMERA_Z, V2_FOV } from './fieldSettings'
 
 interface HeroBackgroundSceneV2Props {
   pointerTargetRef: RefObject<HTMLElement | null>
+  onSceneReady: () => void
 }
 
-export default function HeroBackgroundSceneV2({ pointerTargetRef }: HeroBackgroundSceneV2Props) {
+export default function HeroBackgroundSceneV2({ pointerTargetRef, onSceneReady }: HeroBackgroundSceneV2Props) {
   const profile = useWebGLPerformanceProfile()
 
   return (
@@ -21,7 +22,12 @@ export default function HeroBackgroundSceneV2({ pointerTargetRef }: HeroBackgrou
         frameloop={profile.shouldAnimateContinuously ? 'always' : 'demand'}
         gl={{ alpha: true, antialias: profile.quality === 'full',
           powerPreference: profile.quality === 'full' ? 'high-performance' : 'low-power' }}
-        onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
+        onCreated={({ gl }) => {
+          gl.setClearColor(0x000000, 0)
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            if (gl.domElement.isConnected) onSceneReady()
+          }))
+        }}
         resize={{ debounce: { resize: 100, scroll: 0 }, scroll: false }}
       >
         <HeroSceneV2 pointerTargetRef={pointerTargetRef} profile={profile} />

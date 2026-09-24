@@ -127,6 +127,10 @@ export function GlobalCursor() {
 
     const move = (event: PointerEvent) => {
       if (!enabled) return
+      if (document.documentElement.hasAttribute('data-site-opening')) {
+        hideIndicator()
+        return
+      }
       const target = event.target
       if (event.pointerType !== 'mouse' ||
         (target instanceof Element && target.closest(TEXT_INPUT_SELECTOR))) {

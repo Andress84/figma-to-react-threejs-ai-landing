@@ -2,10 +2,16 @@
 // glyphs, never section/container rectangles. Existing stacking contexts and
 // GSAP transforms remain entirely owned by their original components.
 const SURFACES = [
-  '[data-scroll-feature-card] article', '[data-pricing-card]',
-  '[data-cta-panel]', '[data-faq-row]', '[data-pricing-billing]',
-  'button:not([aria-hidden="true"])', 'a[href]', 'input', 'textarea', 'select',
-  '[role="button"]', '#site-mobile-navigation[data-visible="true"]',
+  '[data-scroll-feature-card] article',
+  '[data-pricing-card]',
+  '[data-cta-panel]',
+  '[data-faq-row]',
+  '[data-pricing-billing]',
+  '[data-cursor-surface]',
+  'input',
+  'textarea',
+  'select',
+  '#site-mobile-navigation[data-visible="true"]',
 ].join(', ')
 
 type TextMask = {
