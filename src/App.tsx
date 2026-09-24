@@ -11,6 +11,7 @@ import { ResultsSection } from './components/sections/ResultsSection'
 import { SectionAtmosphere } from './components/sections/SectionAtmosphere'
 import { SiteHeader } from './components/sections/SiteHeader'
 import { SiteFooter } from './components/sections/SiteFooter'
+import { BackToTop } from './components/ui/BackToTop'
 import { GlobalCursor } from './components/ui/GlobalCursor'
 import { SitePreloader } from './components/ui/SitePreloader'
 import type { FeatureCrossMotion } from './components/three/FeatureCross'
@@ -52,6 +53,7 @@ function App() {
         </div>
       </main>
       <SiteFooter />
+      <BackToTop />
       <GlobalCursor />
       {opening && (
         <SitePreloader quality={profile.quality} heroReady={heroReady}

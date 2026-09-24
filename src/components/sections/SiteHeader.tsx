@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLenis } from 'lenis/react'
 
 import logo from '../../assets/w-logo-placeholder.svg'
+import { focusScrollTarget, scrollToTarget } from '../animation/scrollToTarget'
 import { gsap } from '../../hooks/useGsap'
 import { ButtonLink } from '../ui/ButtonLink'
 import { Container } from '../ui/Container'
@@ -10,8 +11,8 @@ import styles from './SiteHeader.module.css'
 const navigation = [
   { label: 'Home', href: '#home' },
   { label: 'Product', href: '#product' },
-  { label: 'Solutions', href: '#solutions' },
   { label: 'Pricing', href: '#pricing' },
+  { label: 'FAQ', href: '#faq' },
 ]
 
 type CloseReason = 'toggle' | 'escape' | 'link' | 'backdrop'
@@ -19,6 +20,7 @@ type CloseReason = 'toggle' | 'escape' | 'link' | 'backdrop'
 export function SiteHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isPanelVisible, setIsPanelVisible] = useState(false)
+  const [activeHref, setActiveHref] = useState('#home')
   const isOpenRef = useRef(false)
   const pendingHrefRef = useRef<string | null>(null)
   const restoreFocusRef = useRef(false)
@@ -29,6 +31,40 @@ export function SiteHeader() {
   const backdropRef = useRef<HTMLButtonElement>(null)
   const timelineRef = useRef<gsap.core.Timeline | null>(null)
   const lenis = useLenis()
+
+  const navigateTo = useCallback((href: string) => {
+    const target = document.getElementById(href.slice(1))
+    if (window.location.hash !== href) window.history.pushState(null, '', href)
+    if (!target) {
+      menuTriggerRef.current?.focus({ preventScroll: true })
+      return
+    }
+
+    scrollToTarget(href === '#home' ? 0 : target, lenis)
+    focusScrollTarget(target)
+  }, [lenis])
+
+  useEffect(() => {
+    const updateActive = () => {
+      const marker = Math.min(window.innerHeight * 0.32, 300)
+      let current = '#home'
+      for (const { href } of navigation) {
+        if ((document.getElementById(href.slice(1))?.getBoundingClientRect().top ?? Infinity) <= marker) {
+          current = href
+        }
+      }
+      setActiveHref((previous) => previous === current ? previous : current)
+    }
+    updateActive()
+    window.addEventListener('scroll', updateActive, { passive: true })
+    window.addEventListener('resize', updateActive)
+    window.addEventListener('hashchange', updateActive)
+    return () => {
+      window.removeEventListener('scroll', updateActive)
+      window.removeEventListener('resize', updateActive)
+      window.removeEventListener('hashchange', updateActive)
+    }
+  }, [])
 
   const openMenu = useCallback(() => {
     if (isOpenRef.current) return
@@ -187,24 +223,12 @@ export function SiteHeader() {
     const href = pendingHrefRef.current
     pendingHrefRef.current = null
     if (href) {
-      const target = document.getElementById(href.slice(1))
-      if (window.location.hash !== href) window.location.hash = href
-      else target?.scrollIntoView({ behavior: 'smooth' })
-      if (target) {
-        const hadTabIndex = target.hasAttribute('tabindex')
-        target.tabIndex = -1
-        target.focus({ preventScroll: true })
-        if (!hadTabIndex) {
-          target.addEventListener('blur', () => target.removeAttribute('tabindex'), { once: true })
-        }
-      } else {
-        menuTriggerRef.current?.focus({ preventScroll: true })
-      }
+      navigateTo(href)
     } else if (restoreFocusRef.current) {
       menuTriggerRef.current?.focus({ preventScroll: true })
     }
     restoreFocusRef.current = false
-  }, [isPanelVisible])
+  }, [isPanelVisible, navigateTo])
 
   useEffect(() => {
     if (!isPanelVisible) return
@@ -264,10 +288,9 @@ export function SiteHeader() {
   }
 
   const handleHeaderLink = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    if (isOpenRef.current) {
-      event.preventDefault()
-      closeMenu('link', href)
-    }
+    event.preventDefault()
+    if (isOpenRef.current) closeMenu('link', href)
+    else navigateTo(href)
   }
 
   return (
@@ -307,7 +330,8 @@ export function SiteHeader() {
                   ref={index === 0 ? homeLinkRef : undefined}
                   className={styles.navLink}
                   href={href}
-                  aria-current={index === 0 ? 'page' : undefined}
+                  aria-current={activeHref === href ? 'page' : undefined}
+                  onClick={(event) => handleHeaderLink(event, href)}
                 >
                   {label}
                 </a>
@@ -336,12 +360,12 @@ export function SiteHeader() {
           inert={!isPanelVisible}
         >
           <ul className={styles.mobileLinks}>
-            {navigation.map(({ label, href }, index) => (
+            {navigation.map(({ label, href }) => (
               <li key={href}>
                 <a
                   className={styles.mobileNavLink}
                   href={href}
-                  aria-current={index === 0 ? 'page' : undefined}
+                  aria-current={activeHref === href ? 'page' : undefined}
                   data-mobile-menu-item
                   onClick={(event) => handleMenuLink(event, href)}
                 >

@@ -116,7 +116,7 @@ export function useHeroFeaturesTransition(
             onReverseComplete: () => {
               card.dataset.settled = 'false'
               resetCardSurface(card)
-            } }, (wide ? 0.405 : 0.275) + index * 0.03)
+            } }, (wide ? 0.36 : 0.24) + index * 0.03)
       })
 
       return () => {
