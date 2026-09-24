@@ -1,7 +1,7 @@
 .section {
     position: relative;
     overflow: hidden;
-    padding-block: var(--space-16) var(--space-20);
+    padding-block: var(--space-16) var(--space-12);
     background:
         radial-gradient(circle at 100% 100%, var(--color-primary-subtle), transparent 32rem),
         var(--color-bg);
@@ -54,7 +54,7 @@
 
 @media (min-width: 48rem) {
     .section {
-        padding-block: var(--space-16);
+        padding-block: var(--space-16) var(--space-12);
     }
 
     .description {
