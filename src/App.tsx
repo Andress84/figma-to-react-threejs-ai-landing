@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
 
+import { AuthProvider } from './components/auth/AuthProvider'
 import { SmoothScroll } from './components/animation/SmoothScroll'
 import { FeaturesSection } from './components/sections/FeaturesSection'
 import { FaqSection } from './components/sections/FaqSection'
@@ -33,7 +34,7 @@ function App() {
   useResultsTransition(mainRef, profile.quality)
 
   return (
-    <>
+    <AuthProvider>
       <SmoothScroll enabled={profile.quality === 'full'} locked={opening} />
       <SiteHeader />
       <main ref={mainRef} id="main-content" tabIndex={-1}>
@@ -59,7 +60,7 @@ function App() {
         <SitePreloader quality={profile.quality} heroReady={heroReady}
           onComplete={onOpeningComplete} />
       )}
-    </>
+    </AuthProvider>
   )
 }
 

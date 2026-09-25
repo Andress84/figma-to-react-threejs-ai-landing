@@ -4,7 +4,8 @@ import { useLenis } from 'lenis/react'
 import logo from '../../assets/w-logo-placeholder.svg'
 import { focusScrollTarget, scrollToTarget } from '../animation/scrollToTarget'
 import { gsap } from '../../hooks/useGsap'
-import { ButtonLink } from '../ui/ButtonLink'
+import { useAuth } from '../auth/authContext'
+import { Button } from '../ui/Button'
 import { Container } from '../ui/Container'
 import styles from './SiteHeader.module.css'
 
@@ -18,10 +19,12 @@ const navigation = [
 type CloseReason = 'toggle' | 'escape' | 'link' | 'backdrop'
 
 export function SiteHeader() {
+  const { openAuth } = useAuth()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isPanelVisible, setIsPanelVisible] = useState(false)
   const [activeHref, setActiveHref] = useState('#home')
   const isOpenRef = useRef(false)
+  const pendingLoginRef = useRef(false)
   const pendingHrefRef = useRef<string | null>(null)
   const restoreFocusRef = useRef(false)
   const menuTriggerRef = useRef<HTMLButtonElement>(null)
@@ -70,6 +73,7 @@ export function SiteHeader() {
     if (isOpenRef.current) return
     isOpenRef.current = true
     pendingHrefRef.current = null
+    pendingLoginRef.current = false
     restoreFocusRef.current = false
     setIsPanelVisible(true)
     setIsMenuOpen(true)
@@ -152,6 +156,7 @@ export function SiteHeader() {
         }
         isOpenRef.current = false
         pendingHrefRef.current = null
+        pendingLoginRef.current = false
         restoreFocusRef.current = false
         setIsMenuOpen(false)
         setIsPanelVisible(false)
@@ -222,13 +227,16 @@ export function SiteHeader() {
     if (isPanelVisible) return
     const href = pendingHrefRef.current
     pendingHrefRef.current = null
-    if (href) {
+    if (pendingLoginRef.current) {
+      pendingLoginRef.current = false
+      openAuth({ mode: 'login' }, menuTriggerRef.current)
+    } else if (href) {
       navigateTo(href)
     } else if (restoreFocusRef.current) {
       menuTriggerRef.current?.focus({ preventScroll: true })
     }
     restoreFocusRef.current = false
-  }, [isPanelVisible, navigateTo])
+  }, [isPanelVisible, navigateTo, openAuth])
 
   useEffect(() => {
     if (!isPanelVisible) return
@@ -237,7 +245,7 @@ export function SiteHeader() {
       const elements: Array<HTMLElement | null> = [
         logoRef.current,
         menuTriggerRef.current,
-        ...Array.from(mobileNavigationRef.current?.querySelectorAll<HTMLAnchorElement>('a') ?? []),
+        ...Array.from(mobileNavigationRef.current?.querySelectorAll<HTMLElement>('a, button') ?? []),
       ]
       return elements.filter((element): element is HTMLElement => element !== null)
     }
@@ -338,7 +346,8 @@ export function SiteHeader() {
               </li>
             ))}
           </ul>
-          <ButtonLink className={styles.login} href="#login">Login</ButtonLink>
+          <Button className={styles.login} aria-haspopup="dialog" data-auth-login
+            onClick={(event) => openAuth({ mode: 'login' }, event.currentTarget)}>Login</Button>
         </nav>
 
         <button
@@ -375,10 +384,13 @@ export function SiteHeader() {
             ))}
           </ul>
           <div className={styles.mobileLoginWrap}>
-            <ButtonLink className={styles.mobileLogin} href="#login"
-              data-mobile-menu-item onClick={(event) => handleMenuLink(event, '#login')}>
+            <Button className={styles.mobileLogin} aria-haspopup="dialog"
+              data-mobile-menu-item onClick={() => {
+                pendingLoginRef.current = true
+                closeMenu('link')
+              }}>
               Login
-            </ButtonLink>
+            </Button>
           </div>
         </nav>
       </Container>

@@ -1,5 +1,7 @@
 import { lazy, Suspense, useRef, useState } from 'react'
 
+import { useAuth } from '../auth/authContext'
+import { Button } from '../ui/Button'
 import { ButtonLink } from '../ui/ButtonLink'
 import { Container } from '../ui/Container'
 import { getHeroBackgroundVariant } from '../three/heroBackgroundVariant'
@@ -13,6 +15,7 @@ const HeroBackgroundSceneV2 = lazy(
 )
 
 export function HeroSection({ onSceneReady }: { onSceneReady: () => void }) {
+  const { openAuth } = useAuth()
   const heroRef = useRef<HTMLElement>(null)
   const [backgroundVariant] = useState(getHeroBackgroundVariant)
   const Background = backgroundVariant === 'v2' ? HeroBackgroundSceneV2 : HeroBackgroundScene
@@ -60,9 +63,10 @@ export function HeroSection({ onSceneReady }: { onSceneReady: () => void }) {
         </p>
 
         <div className={styles.actions}>
-          <ButtonLink href="#get-started" size="lg">
+          <Button size="lg" aria-haspopup="dialog"
+            onClick={(event) => openAuth({ mode: 'signup' }, event.currentTarget)}>
             Get Started
-          </ButtonLink>
+          </Button>
           <ButtonLink variant="secondary" href="#product" size="lg">
             View Features
           </ButtonLink>

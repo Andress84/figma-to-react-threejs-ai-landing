@@ -44,6 +44,12 @@
     transition: opacity 800ms ease;
 }
 
+/* R3F sets pointer-events inline on its wrapper. The decorative overlap must
+   not intercept the Results CTA; field interaction already uses window events. */
+.fieldCanvas > div {
+    pointer-events: none !important;
+}
+
 .fieldCanvas[data-ready='true'] {
     opacity: 1;
 }

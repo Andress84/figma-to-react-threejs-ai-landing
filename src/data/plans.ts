@@ -1,3 +1,5 @@
+export type BillingPeriod = 'monthly' | 'yearly'
+
 export type Plan = {
   id: string
   name: string

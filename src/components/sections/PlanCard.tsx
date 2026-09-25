@@ -1,8 +1,9 @@
-import type { Plan } from '../../data/plans'
-import { ButtonLink } from '../ui/ButtonLink'
+import type { BillingPeriod, Plan } from '../../data/plans'
+import { useAuth } from '../auth/authContext'
+import { Button } from '../ui/Button'
 import styles from './PlanCard.module.css'
 
-export type BillingPeriod = 'monthly' | 'yearly'
+export type { BillingPeriod } from '../../data/plans'
 
 type PlanCardProps = {
   plan: Plan
@@ -10,6 +11,7 @@ type PlanCardProps = {
 }
 
 export function PlanCard({ plan, billingPeriod }: PlanCardProps) {
+  const { openAuth } = useAuth()
   const active = billingPeriod === 'yearly' ? plan.yearly : plan
   const annualTotal = billingPeriod === 'yearly' ? plan.yearly.annualTotal : undefined
   const priceLabel = [active.price, active.billingPeriod, annualTotal, plan.discount]
@@ -65,15 +67,16 @@ export function PlanCard({ plan, billingPeriod }: PlanCardProps) {
           </ul>
         </div>
 
-        <ButtonLink
+        <Button
           className={styles.cta}
-          href={plan.ctaHref}
+          aria-haspopup="dialog"
+          onClick={(event) => openAuth({ mode: 'signup', plan, billingPeriod }, event.currentTarget)}
           variant={plan.featured ? 'primary' : 'secondary'}
           size="md"
           data-pricing-part="cta"
         >
           {plan.ctaLabel}
-        </ButtonLink>
+        </Button>
       </article>
     </li>
   )

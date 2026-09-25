@@ -1,13 +1,15 @@
 import { useRef } from 'react'
 
 import { useWebGLPerformanceProfile } from '../three/useWebGLPerformanceProfile'
-import { ButtonLink } from '../ui/ButtonLink'
+import { useAuth } from '../auth/authContext'
+import { Button } from '../ui/Button'
 import { Container } from '../ui/Container'
 import { useFinalCtaTransition } from '../../hooks/useFinalCtaTransition'
 import { FinalCtaOrbit } from './FinalCtaOrbit'
 import styles from './FinalCtaSection.module.css'
 
 export function FinalCtaSection() {
+  const { openAuth } = useAuth()
   const sectionRef = useRef<HTMLElement>(null)
   const { quality } = useWebGLPerformanceProfile()
 
@@ -32,9 +34,10 @@ export function FinalCtaSection() {
             Start automating daily workflows, connect your team tools, and
             scale business operations from one intelligent platform.
           </p>
-          <ButtonLink
+          <Button
             className={styles.cta}
-            href="#get-started"
+            aria-haspopup="dialog"
+            onClick={(event) => openAuth({ mode: 'signup' }, event.currentTarget)}
             size="md"
             data-cta-button
             endIcon={
@@ -50,7 +53,7 @@ export function FinalCtaSection() {
             }
           >
             Start Free
-          </ButtonLink>
+          </Button>
         </div>
       </Container>
     </section>
