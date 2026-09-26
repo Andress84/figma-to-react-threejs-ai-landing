@@ -2,17 +2,50 @@
 
 A high-end interactive AI SaaS landing page designed in Figma and developed as a modern frontend portfolio showcase.
 
-The project combines a custom responsive UI with cinematic scroll transitions, WebGL effects, procedural backgrounds, particle systems, fluid cursor interaction, smooth scrolling, and accessibility-aware motion.
+The project combines a custom responsive UI with cinematic scroll transitions, WebGL effects, procedural backgrounds, particle systems, fluid cursor interaction, smooth scrolling, frontend authentication demo flows, and accessibility-aware adaptive performance.
+
+**Live Demo:**
+https://andress84.github.io/figma-to-react-threejs-ai-landing/
+
+**Figma:**
+https://www.figma.com/design/CkBJVdCdnRiGaKfhlu3b9K/Automate-Workflows.-Scale-With-AI.?node-id=0-1&t=5Ny4wPgjOmTrOmG6-1
+
+**Repository:**
+https://github.com/Andress84/figma-to-react-threejs-ai-landing
 
 > This is a frontend concept / portfolio project.
 > The UI/UX design is original and was created specifically for this implementation.
+
+---
+
+## Live Demo
+
+The public portfolio build is available on **GitHub Pages**:
+
+https://andress84.github.io/figma-to-react-threejs-ai-landing/
+
+The deployed demo includes the complete interactive landing-page experience:
+
+- cinematic preloader
+- WebGL Hero
+- scroll-driven sections
+- adaptive performance system
+- fluid cursor
+- responsive navigation
+- pricing interactions
+- FAQ accordion
+- frontend Login / Sign Up / onboarding demo
+- Back-to-Top navigation
+- reduced-motion behavior
+
+---
 
 ## Design
 
 **Figma source:**
 https://www.figma.com/design/CkBJVdCdnRiGaKfhlu3b9K/Automate-Workflows.-Scale-With-AI.?node-id=0-1&t=5Ny4wPgjOmTrOmG6-1
 
-The implementation follows the original Figma direction while extending it with interactive motion, WebGL effects, scroll choreography, pointer interaction, and responsive behavior.
+The implementation follows the original Figma direction while extending it with interactive motion, WebGL effects, scroll choreography, pointer interaction, responsive behavior, and performance-aware rendering.
 
 ---
 
@@ -22,7 +55,7 @@ The landing page presents a fictional AI SaaS platform focused on workflow autom
 
 The project was built as a portfolio case study demonstrating the complete workflow from:
 
-**UI/UX design in Figma → React architecture → responsive implementation → advanced animation → WebGL interaction → performance and accessibility polish.**
+**UI/UX design in Figma → React architecture → responsive implementation → advanced animation → WebGL interaction → adaptive performance → accessibility and deployment polish.**
 
 The goal is not only to reproduce a static design, but to turn it into a polished, immersive web experience suitable for a modern SaaS product.
 
@@ -38,9 +71,11 @@ The Hero includes a custom Three.js / React Three Fiber scene with:
 - particle layers
 - depth and atmospheric effects
 - pointer interaction
-- responsive rendering profiles
+- responsive rendering budgets
 - controlled device pixel ratio
+- adaptive frame-rate limits
 - reduced-motion and constrained-device behavior
+- offscreen pause / resume support
 
 The WebGL scene is integrated with the rest of the page rather than treated as a standalone visual demo.
 
@@ -55,11 +90,12 @@ The Hero is already mounted beneath the preloader, allowing the transition to re
 The preloader also handles:
 
 - font readiness
-- Hero/WebGL readiness
+- Hero / WebGL readiness
 - bounded fallback timing
 - scroll locking
 - Lenis synchronization
 - responsive particle density
+- reduced-motion behavior
 - cleanup after the reveal
 
 ### Scroll-Driven Storytelling
@@ -81,11 +117,11 @@ The animation system is designed to feel cinematic without turning the page into
 
 ### Smooth Scrolling
 
-The project uses **Lenis** for smooth scrolling on full-performance devices.
+The project uses **Lenis** for smooth scrolling where the active performance / motion profile allows it.
 
-Lenis is synchronized with GSAP / ScrollTrigger through the existing animation ticker instead of introducing independent animation loops.
+Lenis is synchronized with GSAP / ScrollTrigger through the existing animation ticker instead of introducing independent permanent animation loops.
 
-Navigation links, FAQ navigation, and the Back-to-Top control use the same scrolling architecture.
+Navigation links, FAQ navigation, modal scroll restoration, and the Back-to-Top control reuse the same scrolling architecture.
 
 ### Custom Fluid Cursor
 
@@ -95,11 +131,12 @@ Desktop fine-pointer devices receive a custom cursor system featuring:
 - interactive hover state
 - translucent hover circle
 - WebGL fluid trail
-- persistent velocity/color simulation
+- persistent velocity / color simulation
 - fluid movement across section boundaries
 - foreground masking so text, cards, buttons, and controls remain readable
+- adaptive simulation budgets
 
-The fluid layer is dynamically loaded and disabled for coarse pointers and reduced-motion environments.
+The fluid layer is disabled for coarse pointers and reduced-motion environments.
 
 ### Responsive Animated Navigation
 
@@ -154,6 +191,7 @@ The Pricing section contains:
 - hover elevation
 - animated WebGL-style background atmosphere
 - star / particle depth
+- performance-aware rendering budgets
 
 ### FAQ
 
@@ -165,6 +203,27 @@ The FAQ section includes:
 - smooth accordion transitions
 - accessible expandable questions
 - direct navigation through the `#faq` anchor
+
+### Frontend Auth / Onboarding Demo
+
+The project includes a presentation-level authentication flow for portfolio demonstration.
+
+Current demo flows include:
+
+- Login modal
+- Sign Up flow
+- frontend validation
+- password visibility control
+- loading and success states
+- simple onboarding flow
+- Pricing plan context passed into the sign-up experience
+- Monthly / Yearly billing context preservation
+- focus trapping and focus restoration
+- Escape / backdrop / close-button dismissal
+- Lenis and page-scroll restoration after closing
+- responsive short-height / mobile behavior
+
+No production authentication backend or credential persistence is used.
 
 ### Final CTA
 
@@ -183,7 +242,7 @@ A responsive Back-to-Top control appears after meaningful page scrolling and ret
 
 It includes:
 
-- animated show/hide behavior
+- animated show / hide behavior
 - keyboard accessibility
 - responsive positioning
 - reduced-motion support
@@ -226,18 +285,23 @@ It includes:
 - ESLint
 - TypeScript compiler
 - Vite production build
+- Git
+- GitHub Actions
+- GitHub Pages
 
 ---
 
 ## Architecture
 
-The application is organized around reusable UI primitives, section-specific components, animation hooks, data modules, and isolated WebGL systems.
+The application is organized around reusable UI primitives, section-specific components, shared motion infrastructure, adaptive-performance modules, data modules, and isolated WebGL systems.
 
 ```text
 src/
 ├── assets/
 ├── components/
 │   ├── animation/
+│   ├── auth/
+│   ├── performance/
 │   ├── sections/
 │   ├── three/
 │   └── ui/
@@ -247,6 +311,9 @@ src/
 ├── types/
 ├── App.tsx
 └── main.tsx
+
+scripts/
+└── performance-policy.test.ts
 ```
 
 ### `components/sections`
@@ -269,18 +336,22 @@ Contains WebGL / React Three Fiber systems such as:
 - Hero rendering
 - procedural effects
 - feature artwork
-- performance profiling
+- Pricing field rendering
 - shaders and Three.js utilities
+- performance-aware scene integration
 
 ### `components/ui`
 
 Contains shared interface and experience-level components such as:
 
 - buttons
-- layout primitives
 - global cursor
 - preloader
 - Back-to-Top control
+
+### `components/auth`
+
+Contains the frontend-only authentication and onboarding demo experience.
 
 ### `components/animation` and `hooks`
 
@@ -290,32 +361,178 @@ Contain shared motion infrastructure including:
 - reusable smooth-scroll targeting
 - GSAP setup
 - section transition timelines
+- reduced-motion helpers
 - performance-aware animation behavior
+
+### `components/performance`
+
+Contains the shared adaptive-performance infrastructure used across WebGL scenes and decorative effects:
+
+- device capability classification
+- High / Balanced / Low / Reduced quality tiers
+- shared rendering budgets
+- runtime frame-performance monitoring
+- downgrade-only quality adaptation
+- visibility and background activity tracking
+- shared scene frame scheduling
+- WebGL capability reporting and fallback handling
 
 ---
 
-## Performance Strategy
+## Adaptive Performance Strategy
 
-The project uses three rendering profiles:
+The project includes a shared adaptive-performance system designed to keep the experience usable on both high-end hardware and weaker laptops, tablets, and smartphones.
 
-- `full`
-- `constrained`
+Instead of applying one rendering configuration to every device, the application selects one of four performance tiers:
+
+- `high`
+- `balanced`
+- `low`
 - `reduced`
 
-The active profile depends on pointer capabilities and the user's motion preferences.
+### Initial Device Classification
 
-Performance measures include:
+The initial rendering tier is selected from a combination of signals rather than viewport width alone.
 
-- DPR caps for WebGL
-- lower-cost rendering on coarse-pointer devices
-- reduced particle density where appropriate
-- lazy loading of expensive visual systems
-- pausing unnecessary animation work
-- reusing the GSAP ticker instead of adding multiple permanent RAF loops
-- cleanup of listeners, timelines, canvases, and WebGL resources
-- reduced-motion fallbacks
+Current signals include:
 
-The interface remains usable without the full WebGL experience.
+- `prefers-reduced-motion`
+- pointer / hover capability
+- logical CPU core count
+- available device-memory hints where supported
+- effective pixel pressure based on viewport size and device pixel ratio
+
+No single weak hardware signal automatically forces the lowest quality profile.
+
+### Runtime Adaptation
+
+A lightweight performance monitor can downgrade rendering quality if sustained slow frame windows are detected.
+
+Runtime adaptation is intentionally **downgrade-only**:
+
+```text
+High → Balanced → Low
+```
+
+The application does not repeatedly upgrade and downgrade during the same session, which avoids visual instability and quality oscillation.
+
+### Rendering Budgets
+
+Each tier has its own rendering budget for:
+
+- WebGL DPR
+- Hero frame rate
+- Pricing frame rate
+- procedural field resolution
+- particle density
+- star-field density
+- AI / stream particle counts
+- atmospheric effects
+- fluid-cursor simulation resolution
+- fluid dye / output resolution
+- pressure iterations
+
+The full visual composition remains available on capable hardware, while lower tiers first reduce resolution and simulation cost before removing important visual structure.
+
+### High
+
+The High tier preserves the approved full-quality experience:
+
+- WebGL DPR capped at `1.75`
+- full Hero field detail
+- highest particle budgets
+- highest fluid-cursor resolution
+- uncapped Hero scene scheduling where appropriate
+- Pricing targeted at up to 60 fps
+
+### Balanced
+
+Balanced remains visually close to High while reducing GPU / CPU cost:
+
+- WebGL DPR capped at `1.25`
+- Hero capped at 60 fps
+- Pricing capped at 45 fps
+- reduced procedural-field density
+- reduced particle budgets
+- lighter fluid simulation
+
+### Low
+
+Low is designed for weaker or constrained hardware:
+
+- WebGL DPR capped at `1`
+- Hero capped at 30 fps
+- Pricing capped at 30 fps
+- substantially lighter procedural fields
+- lower particle and star counts
+- reduced GPU buffer / simulation pressure
+- fluid cursor retains a 60 Hz solver at a lighter resolution so motion stays smooth
+
+### Reduced
+
+Reduced is activated when the user requests reduced motion:
+
+- substantially reduced continuous animation
+- lightweight visual budgets
+- reduced particle work
+- no stream-particle load
+- functional navigation and content remain available without depending on decorative motion
+
+### Offscreen and Background Pausing
+
+Expensive visual systems do not render continuously when they are not needed.
+
+The shared performance layer can pause decorative work when:
+
+- Hero / WebGL scenes are offscreen
+- the browser tab becomes hidden
+- an application overlay temporarily covers the experience
+- a scene has completed the static frames it needs
+
+This reduces unnecessary GPU and CPU usage while the visitor is reading other sections or while the page is not visible.
+
+### Shared Frame Scheduling
+
+Decorative WebGL scenes reuse the existing GSAP ticker rather than introducing separate permanent animation loops.
+
+The shared frame driver supports:
+
+- uncapped rendering where appropriate
+- 60 / 45 / 30 fps rendering budgets
+- fractional frame timing on high-refresh-rate displays
+- pause / resume without elapsed-time jumps
+- initial repaint frames
+- font-layout repaint
+- resize repaint
+- static / reduced-motion rendering paths
+
+### WebGL Resilience
+
+The performance system also monitors rendering capability and failure states.
+
+Current safeguards include:
+
+- WebGL capability reporting
+- maximum texture-size checks
+- WebGL context-loss handling
+- shader-error handling
+- constrained fallback behavior when GPU capability is limited
+- CSS / DOM content remaining usable if advanced rendering becomes unavailable
+
+### Performance Principles
+
+The implementation follows several rules:
+
+- preserve visual quality on capable hardware
+- reduce resolution and simulation cost before removing major effects
+- pause work that is not visible
+- avoid duplicate `requestAnimationFrame` / ticker loops
+- avoid unnecessary GPU-data rebuilding
+- stop settled simulations where possible
+- clean up listeners, timers, tickers, canvases, and WebGL resources
+- keep responsive layout independent from hardware classification
+- respect `prefers-reduced-motion`
+- keep the page usable without the full WebGL experience
 
 ---
 
@@ -329,12 +546,14 @@ Current considerations include:
 - keyboard-accessible controls
 - visible focus behavior
 - animated mobile-menu focus management
-- Escape-key menu closing
+- modal focus trapping
+- focus restoration after modal / menu dismissal
+- Escape-key support
 - skip-to-content navigation
 - appropriate ARIA states
 - decorative graphics excluded from accessibility semantics
 - `prefers-reduced-motion` handling
-- native cursor fallback for touch/coarse-pointer devices
+- native cursor fallback for touch / coarse-pointer devices
 
 ---
 
@@ -346,10 +565,33 @@ The implementation is designed for:
 - standard desktop / laptop screens
 - tablets
 - mobile devices
+- short landscape viewports
 
 Layouts and animation behavior are adapted rather than simply scaled down.
 
-Heavy pointer/WebGL interactions are reduced or removed where they do not make sense on touch devices.
+Heavy pointer / WebGL interactions are reduced or disabled where they do not make sense on touch or reduced-motion devices.
+
+---
+
+## Deployment
+
+The public portfolio build is deployed through **GitHub Pages**.
+
+**Live site:**
+https://andress84.github.io/figma-to-react-threejs-ai-landing/
+
+Deployment uses:
+
+- Vite production builds
+- GitHub Actions
+- GitHub Pages
+- repository-relative asset paths through the configured Vite `base`
+
+The current Vite base path is configured for:
+
+```text
+/figma-to-react-threejs-ai-landing/
+```
 
 ---
 
@@ -403,6 +645,12 @@ git diff --check
 
 The project is developed with TypeScript and ESLint enabled, and changes should not introduce TypeScript, lint, runtime, or build errors.
 
+The adaptive-performance policy also has a dedicated repository test script:
+
+```text
+scripts/performance-policy.test.ts
+```
+
 ---
 
 ## Development Guidelines
@@ -422,6 +670,7 @@ When extending the project:
 - avoid unnecessary dependencies
 - avoid duplicate animation loops
 - reuse the existing Lenis / GSAP architecture
+- reuse the shared performance layer instead of adding independent device checks
 - respect reduced-motion behavior
 - maintain responsive and keyboard behavior
 - clean up animation and WebGL resources correctly
@@ -432,18 +681,22 @@ When extending the project:
 
 This repository represents a **frontend portfolio / concept implementation**, not a complete production SaaS application.
 
-Some UI actions such as authentication, account creation, and product CTAs are presentation-level interactions and are not connected to a production backend.
+Authentication, account creation, onboarding, and product CTAs are presentation-level frontend interactions and are not connected to a production backend.
+
+No real credentials are stored or authenticated.
 
 The focus of the project is:
 
-- UI/UX execution
+- UI / UX execution
 - React architecture
 - responsive frontend development
 - advanced interaction design
 - GSAP motion
 - Three.js / WebGL
-- performance-aware animation
+- adaptive performance
+- accessibility-aware animation
 - polished product presentation
+- production-style frontend deployment
 
 ---
 
@@ -451,8 +704,14 @@ The focus of the project is:
 
 UI/UX design and frontend implementation by **Andrii Kurus / LaimAnd**.
 
+**Live Demo:**
+https://andress84.github.io/figma-to-react-threejs-ai-landing/
+
 **Figma:**
 https://www.figma.com/design/CkBJVdCdnRiGaKfhlu3b9K/Automate-Workflows.-Scale-With-AI.?node-id=0-1&t=5Ny4wPgjOmTrOmG6-1
+
+**GitHub:**
+https://github.com/Andress84/figma-to-react-threejs-ai-landing
 
 ---
 
@@ -460,6 +719,30 @@ https://www.figma.com/design/CkBJVdCdnRiGaKfhlu3b9K/Automate-Workflows.-Scale-Wi
 
 Active portfolio project.
 
-The primary landing-page experience, responsive layouts, motion system, WebGL effects, navigation, pricing interaction, FAQ, preloader, custom cursor, and final CTA are implemented.
+The current implementation includes:
 
-Further work may include deployment polish, performance optimization, visual fine-tuning, and production integration where required.
+- complete responsive landing-page UI
+- cinematic preloader
+- interactive WebGL Hero
+- scroll-driven Features and Results sections
+- Pricing interaction
+- FAQ
+- Final CTA
+- animated responsive navigation
+- global fluid cursor
+- frontend Login / Sign Up / onboarding demo
+- Back-to-Top navigation
+- High / Balanced / Low / Reduced adaptive-performance tiers
+- offscreen and background rendering suspension
+- reduced-motion behavior
+- GitHub Pages deployment
+
+The core frontend experience and the adaptive-performance optimization pass are complete.
+
+Possible future work includes:
+
+- production backend integration
+- real authentication
+- analytics
+- further bundle / code-splitting optimization
+- continued visual fine-tuning

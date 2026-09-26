@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - section2-scroll-transition
+      - main
 
   workflow_dispatch:
 
