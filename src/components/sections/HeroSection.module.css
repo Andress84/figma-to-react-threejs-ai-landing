@@ -280,6 +280,7 @@
 
         .description {
             margin-top: var(--space-8);
+            font-size: 1.125rem;
         }
 }
 
