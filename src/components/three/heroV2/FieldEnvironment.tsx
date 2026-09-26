@@ -1,3 +1,4 @@
+import { usePerformanceProfile } from '../../performance/usePerformanceProfile'
 import { useFrame } from '@react-three/fiber'
 import { useEffect, useMemo, useRef } from 'react'
 import {
@@ -8,7 +9,7 @@ import type { Points } from 'three'
 
 import type { WebGLQuality } from '../useWebGLPerformanceProfile'
 import type { HeroDisplacementField } from '../hero/heroDisplacementField'
-import { getFieldExtent, V2_PROFILES } from './fieldSettings'
+import { getFieldExtent } from './fieldSettings'
 import {
   moteFragmentShader, moteVertexShader, volumeFragmentShader, volumeVertexShader,
 } from './fieldShaders'
@@ -20,11 +21,14 @@ interface FieldEnvironmentProps {
   field: HeroDisplacementField
 }
 
-export function FieldEnvironment({ aspect, quality, animate, field }: FieldEnvironmentProps) {
+export function FieldEnvironment({ aspect, animate, field }: FieldEnvironmentProps) {
+  const { budget } = usePerformanceProfile()
+  const elapsed = useRef(0)
+  const [fieldWidth, fieldHeight] = getFieldExtent(aspect)
   const motesRef = useRef<Points<BufferGeometry, ShaderMaterial>>(null)
   const resources = useMemo(() => {
-    const profile = V2_PROFILES[quality]
-    const extent = new Vector2(...getFieldExtent(aspect))
+    const profile = budget.field
+    const extent = new Vector2(1, 1)
     const common = {
       uTime: { value: 0 },
       uExtent: { value: extent },
@@ -87,7 +91,7 @@ export function FieldEnvironment({ aspect, quality, animate, field }: FieldEnvir
       fragmentShader: moteFragmentShader,
     })
     return { geometry, materials, motes, moteMaterial }
-  }, [aspect, field, quality])
+  }, [field, budget.field])
 
   useEffect(() => () => {
     resources.geometry.dispose()
@@ -100,8 +104,9 @@ export function FieldEnvironment({ aspect, quality, animate, field }: FieldEnvir
     const material = motesRef.current?.material
     if (!material) return
     // The surface materials share this time uniform with the particle material.
-    if (animate) material.uniforms.uTime.value += Math.min(delta, 0.05)
-    else material.uniforms.uTime.value = 0
+    if (animate) elapsed.current += Math.min(delta, 0.05)
+    material.uniforms.uTime.value = animate ? elapsed.current : 0
+    material.uniforms.uExtent.value.set(fieldWidth, fieldHeight)
     material.uniforms.uPixelRatio.value = gl.getPixelRatio()
   })
 

@@ -1,3 +1,4 @@
+import { SceneFrameDriver } from '../../performance/SceneFrameDriver'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { RefObject } from 'react'
@@ -13,11 +14,12 @@ interface PricingFieldProps {
   fieldRef: RefObject<HTMLDivElement | null>
   profile: WebGLPerformanceProfile
   visible: boolean
+  onFailure: () => void
 }
 
 function Field({ fieldRef, profile, visible }: PricingFieldProps) {
   const materialRef = useRef<ShaderMaterial>(null)
-  const { advance, size } = useThree()
+  const { size } = useThree()
   const pointer = useRef({
     x: 0, y: 0, active: false, known: false, updatedAt: 0, vx: 0, vy: 0,
   })
@@ -121,19 +123,6 @@ function Field({ fieldRef, profile, visible }: PricingFieldProps) {
       : 0
   })
 
-  useEffect(() => {
-    // Drive this R3F root from the existing GSAP/Lenis clock, not a new RAF.
-    const interval = 1 / (full ? 60 : 30)
-    let lastFrame = -Infinity
-    const render = (time: number) => {
-      if (document.hidden || time - lastFrame < interval) return
-      lastFrame = time
-      advance(time, false)
-    }
-    render(gsap.ticker.time)
-    if (visible && profile.shouldAnimateContinuously) gsap.ticker.add(render)
-    return () => { gsap.ticker.remove(render) }
-  }, [advance, visible, profile.shouldAnimateContinuously, size.width, size.height, full])
 
   return (
     <mesh frustumCulled={false}>
@@ -149,7 +138,7 @@ function Field({ fieldRef, profile, visible }: PricingFieldProps) {
 export default function PricingField(props: PricingFieldProps) {
   const [ready, setReady] = useState(false)
   const { profile } = props
-  const dpr = Math.min(profile.dpr[1], profile.quality === 'full' ? 1.25 : 1)
+  const dpr = profile.budget.pricingDpr
   return (
     <div className={styles.fieldCanvas} data-ready={ready}>
       <Canvas frameloop="never" dpr={[1, dpr]} fallback={null}
@@ -158,6 +147,8 @@ export default function PricingField(props: PricingFieldProps) {
         onCreated={({ gl }) => { gl.setClearColor(0x000000, 0); setReady(true) }}
         resize={{ debounce: { resize: 100, scroll: 0 }, scroll: false }}>
         <Field {...props} />
+        <SceneFrameDriver active={props.visible} animate={profile.shouldAnimateContinuously}
+          fps={profile.budget.pricingFps} onFailure={props.onFailure} />
       </Canvas>
     </div>
   )

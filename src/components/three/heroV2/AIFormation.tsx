@@ -1,3 +1,5 @@
+import { PERFORMANCE_BUDGETS } from '../../performance/performancePolicy'
+import { usePerformanceProfile } from '../../performance/usePerformanceProfile'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useEffect, useMemo, useRef } from 'react'
 import type { RefObject } from 'react'
@@ -11,11 +13,6 @@ import type { WebGLQuality } from '../useWebGLPerformanceProfile'
 import { V2_CAMERA_Z, V2_FOV } from './fieldSettings'
 import { aiFragmentShader, aiVertexShader } from './aiFormationShaders'
 
-const PARTICLE_COUNTS: Record<WebGLQuality, number> = {
-  full: 3200,
-  constrained: 1200,
-  reduced: 480,
-}
 const FORMATION_Z = -1.2
 const MAX_HEIGHT = 220
 
@@ -69,7 +66,9 @@ interface AIFormationProps {
   animate: boolean
 }
 
-export function AIFormation({ pointerTargetRef, field, quality, animate }: AIFormationProps) {
+export function AIFormation({ pointerTargetRef, field, animate }: AIFormationProps) {
+  const { budget } = usePerformanceProfile()
+  const elapsed = useRef(0)
   const pointsRef = useRef<Points<BufferGeometry, ShaderMaterial>>(null)
   const placementRef = useRef({
     x: 0, y: 0, scale: 0, height: 0, top: 0, bottom: 0,
@@ -78,7 +77,7 @@ export function AIFormation({ pointerTargetRef, field, quality, animate }: AIFor
   const canvas = useThree((state) => state.gl.domElement)
   const invalidate = useThree((state) => state.invalidate)
   const resources = useMemo(() => ({
-    geometry: createFormationGeometry(PARTICLE_COUNTS[quality]),
+    geometry: createFormationGeometry(budget.aiParticles),
     material: new ShaderMaterial({
       transparent: true,
       blending: AdditiveBlending,
@@ -102,7 +101,7 @@ export function AIFormation({ pointerTargetRef, field, quality, animate }: AIFor
       vertexShader: aiVertexShader,
       fragmentShader: aiFragmentShader,
     }),
-  }), [field, quality])
+  }), [field, budget.aiParticles])
 
   useEffect(() => () => {
     resources.geometry.dispose()
@@ -144,8 +143,8 @@ export function AIFormation({ pointerTargetRef, field, quality, animate }: AIFor
         headingTop: title.top - bounds.top,
         headingBottom: title.bottom - bounds.top,
         density: Math.min(1,
-          Math.max(320, PARTICLE_COUNTS.full * (height / MAX_HEIGHT) ** 2)
-          / PARTICLE_COUNTS[quality]),
+          Math.max(320, PERFORMANCE_BUDGETS.high.aiParticles * (height / MAX_HEIGHT) ** 2)
+          / budget.aiParticles),
       }
       invalidate()
     }
@@ -168,7 +167,7 @@ export function AIFormation({ pointerTargetRef, field, quality, animate }: AIFor
       observer.disconnect()
       window.removeEventListener('resize', schedule)
     }
-  }, [canvas, field, invalidate, pointerTargetRef, quality])
+  }, [canvas, field, invalidate, pointerTargetRef, budget.aiParticles])
 
   useFrame(({ gl }, delta) => {
     const material = pointsRef.current?.material
@@ -180,8 +179,8 @@ export function AIFormation({ pointerTargetRef, field, quality, animate }: AIFor
     material.uniforms.uSafeY.value.set(placement.top, placement.bottom)
     material.uniforms.uHeadingY.value.set(placement.headingTop, placement.headingBottom)
     material.uniforms.uDensity.value = placement.density
-    if (animate) material.uniforms.uTime.value += Math.min(delta, 0.05)
-    else material.uniforms.uTime.value = 0
+    if (animate) elapsed.current += Math.min(delta, 0.05)
+    material.uniforms.uTime.value = animate ? elapsed.current : 0
     material.uniforms.uPixelRatio.value = gl.getPixelRatio()
   })
 

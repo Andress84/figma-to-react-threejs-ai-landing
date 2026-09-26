@@ -35,7 +35,7 @@ function App() {
 
   return (
     <AuthProvider>
-      <SmoothScroll enabled={profile.quality === 'full'} locked={opening} />
+      <SmoothScroll enabled={profile.smoothScroll} locked={opening} />
       <SiteHeader />
       <main ref={mainRef} id="main-content" tabIndex={-1}>
         <div className={styles.firstScreen} data-scroll-first-screen>

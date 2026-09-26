@@ -1,3 +1,5 @@
+import { useRef } from 'react'
+import { usePerformanceProfile, useSceneActivity } from '../performance/usePerformanceProfile'
 import type { CSSProperties } from 'react'
 
 import type { WebGLQuality } from '../three/useWebGLPerformanceProfile'
@@ -15,11 +17,6 @@ interface OrbitalMote {
   depth: Depth
 }
 
-const PROFILE_COUNTS: Record<WebGLQuality, number> = {
-  full: 80,
-  constrained: 32,
-  reduced: 12,
-}
 
 // Keep the deterministic motes in the same family as the seeded site starfields.
 function mulberry32(seed: number) {
@@ -33,7 +30,7 @@ function mulberry32(seed: number) {
 }
 
 const random = mulberry32(92925)
-const motes: OrbitalMote[] = Array.from({ length: PROFILE_COUNTS.full }, (_, index) => {
+const motes: OrbitalMote[] = Array.from({ length: 80 }, (_, index) => {
   const depth: Depth = index % 6 === 0 ? 'near' : index % 3 === 0 ? 'far' : 'mid'
   const cluster = random()
   const angle = cluster < 0.38 ? 30 + random() * 62
@@ -58,15 +55,18 @@ const motes: OrbitalMote[] = Array.from({ length: PROFILE_COUNTS.full }, (_, ind
 })
 
 export function FinalCtaOrbit({ quality }: { quality: WebGLQuality }) {
+  const fieldRef = useRef<HTMLDivElement>(null)
+  const { budget } = usePerformanceProfile()
+  const { active } = useSceneActivity(fieldRef)
   return (
-    <div className={styles.orbitAnchor} data-cta-orbit data-quality={quality} aria-hidden="true">
+    <div ref={fieldRef} data-ambient-active={active} className={styles.orbitAnchor} data-cta-orbit data-quality={quality} aria-hidden="true">
       <div className={styles.orbitEntry} data-cta-orbit-entry>
         <div className={styles.orbitTilt} data-cta-orbit-tilt>
           <div className={styles.orbitAmbient} />
           <div className={styles.orbitBase} />
           <div className={styles.orbitGlow} />
           <div className={styles.orbitHighlight} />
-          {motes.slice(0, PROFILE_COUNTS[quality]).map((mote, index) => (
+          {motes.slice(0, budget.orbitMotes).map((mote, index) => (
             <span
               key={index}
               className={styles.orbitMote}

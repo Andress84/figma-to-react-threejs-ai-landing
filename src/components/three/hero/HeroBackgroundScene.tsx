@@ -1,4 +1,7 @@
 import { Canvas } from '@react-three/fiber'
+import { DecorativeBoundary } from '../../performance/DecorativeBoundary'
+import { SceneFrameDriver } from '../../performance/SceneFrameDriver'
+import { useSceneActivity } from '../../performance/usePerformanceProfile'
 import type { RefObject } from 'react'
 
 import { useWebGLPerformanceProfile } from '../useWebGLPerformanceProfile'
@@ -15,6 +18,7 @@ export default function HeroBackgroundScene({
   onSceneReady,
 }: HeroBackgroundSceneProps) {
   const profile = useWebGLPerformanceProfile()
+  const { active } = useSceneActivity(pointerTargetRef)
 
   return (
     <div
@@ -22,7 +26,7 @@ export default function HeroBackgroundScene({
       data-quality={profile.quality}
       aria-hidden="true"
     >
-      <Canvas
+      <DecorativeBoundary onReady={onSceneReady}>{fail => <Canvas
         className={styles.canvas}
         aria-hidden="true"
         role="presentation"
@@ -35,9 +39,7 @@ export default function HeroBackgroundScene({
         }}
         dpr={profile.dpr}
         fallback={null}
-        frameloop={
-          profile.shouldAnimateContinuously ? 'always' : 'demand'
-        }
+        frameloop="never"
         gl={{
           alpha: true,
           antialias: profile.quality === 'full',
@@ -46,14 +48,14 @@ export default function HeroBackgroundScene({
         }}
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0)
-          requestAnimationFrame(() => requestAnimationFrame(() => {
-            if (gl.domElement.isConnected) onSceneReady()
-          }))
+
         }}
         resize={{ debounce: { resize: 100, scroll: 0 }, scroll: false }}
       >
-        <HeroScene pointerTargetRef={pointerTargetRef} profile={profile} />
-      </Canvas>
+        <HeroScene pointerTargetRef={pointerTargetRef} profile={profile} active={active} />
+        <SceneFrameDriver active={active} animate={profile.shouldAnimateContinuously}
+          fps={profile.budget.fps} onReady={onSceneReady} onFailure={fail} />
+      </Canvas>}</DecorativeBoundary>
     </div>
   )
 }

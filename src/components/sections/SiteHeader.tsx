@@ -1,3 +1,4 @@
+import { useBackgroundOcclusion } from '../performance/usePerformanceProfile'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLenis } from 'lenis/react'
 
@@ -22,6 +23,7 @@ export function SiteHeader() {
   const { openAuth } = useAuth()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isPanelVisible, setIsPanelVisible] = useState(false)
+  useBackgroundOcclusion(isPanelVisible)
   const [activeHref, setActiveHref] = useState('#home')
   const isOpenRef = useRef(false)
   const pendingLoginRef = useRef(false)

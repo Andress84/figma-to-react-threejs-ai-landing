@@ -1,23 +1,5 @@
-import { useSyncExternalStore } from 'react'
-
-const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
-
-function getSnapshot() {
-  return window.matchMedia(REDUCED_MOTION_QUERY).matches
-}
-
-function getServerSnapshot() {
-  return false
-}
-
-function subscribe(onStoreChange: () => void) {
-  const mediaQuery = window.matchMedia(REDUCED_MOTION_QUERY)
-
-  mediaQuery.addEventListener('change', onStoreChange)
-
-  return () => mediaQuery.removeEventListener('change', onStoreChange)
-}
+import { usePerformanceProfile } from '../components/performance/usePerformanceProfile'
 
 export function usePrefersReducedMotion() {
-  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
+  return usePerformanceProfile().prefersReducedMotion
 }

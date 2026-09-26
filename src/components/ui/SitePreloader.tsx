@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 import type { WebGLQuality } from '../three/useWebGLPerformanceProfile'
@@ -17,7 +17,8 @@ const SCROLL_KEYS = new Set([
   'ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' ',
 ])
 
-export function SitePreloader({ quality, heroReady, onComplete }: SitePreloaderProps) {
+export function SitePreloader({ quality: initialQuality, heroReady, onComplete }: SitePreloaderProps) {
+  const [quality] = useState(initialQuality)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
   const progressRef = useRef<HTMLOutputElement>(null)

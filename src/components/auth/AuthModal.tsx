@@ -1,3 +1,4 @@
+import { useBackgroundOcclusion } from '../performance/usePerformanceProfile'
 import { useCallback, useLayoutEffect, useRef, useState, type FormEvent } from 'react'
 
 import { gsap } from '../../hooks/useGsap'
@@ -26,6 +27,7 @@ const descriptions: Record<Mode, string> = {
 }
 
 export function AuthModal({ session, onClosed }: { session: AuthSession; onClosed: () => void }) {
+  useBackgroundOcclusion(true)
   const reducedMotion = usePrefersReducedMotion()
   const overlayRef = useRef<HTMLDivElement>(null)
   const backdropRef = useRef<HTMLDivElement>(null)

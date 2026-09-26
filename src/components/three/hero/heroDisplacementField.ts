@@ -30,6 +30,7 @@ export class HeroDisplacementField {
   readonly canvasSize = new Vector2(1, 1)
   readonly texture: DataTexture
   private readonly values: Float32Array
+  private settled = true
 
   constructor(columns = 64, rows = 40) {
     this.resolution = new Vector2(columns, rows)
@@ -53,7 +54,12 @@ export class HeroDisplacementField {
     if (this.canvasSize.x !== width || this.canvasSize.y !== height) {
       this.values.fill(0)
       this.canvasSize.set(width, height)
+      this.settled = true
+      this.texture.needsUpdate = true
     }
+
+    if (!pointer.active && this.settled) return
+    let remainingMotion = 0
 
     // Substeps keep the spring stable at low FPS; ignore long background-tab gaps.
     const elapsed = Math.min(Math.max(delta, 0), 0.05)
@@ -105,9 +111,12 @@ export class HeroDisplacementField {
         this.values[index + 1] = y * scale
         this.values[index + 2] = vx * scale
         this.values[index + 3] = vy * scale
+        remainingMotion = Math.max(remainingMotion, Math.abs(x), Math.abs(y), Math.abs(vx), Math.abs(vy))
       }
     }
 
+    this.settled = !pointer.active && remainingMotion < 0.001
+    if (this.settled) this.values.fill(0)
     this.texture.needsUpdate = true
   }
 

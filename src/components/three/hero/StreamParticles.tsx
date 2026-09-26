@@ -1,3 +1,4 @@
+import { usePerformanceProfile } from '../../performance/usePerformanceProfile'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useEffect, useMemo, useRef } from 'react'
 import {
@@ -24,10 +25,11 @@ interface StreamParticlesProps {
 }
 
 export function StreamParticles({ quality, displacementField, depthMotion }: StreamParticlesProps) {
+  const { budget } = usePerformanceProfile()
   const pointsRef = useRef<Points<BufferGeometry, ShaderMaterial>>(null)
   const { width, height } = useThree((state) => state.viewport)
   const { simulation, geometry, material, projection } = useMemo(() => {
-    const simulation = new StreamParticleSimulation(quality, width, height)
+    const simulation = new StreamParticleSimulation(quality, width, height, budget.streamParticles)
     const geometry = new BufferGeometry()
     geometry.setAttribute('position', new BufferAttribute(simulation.positions, 3).setUsage(DynamicDrawUsage))
     geometry.setAttribute('aDisplacement', new BufferAttribute(simulation.offsets, 2).setUsage(DynamicDrawUsage))
@@ -53,7 +55,7 @@ export function StreamParticles({ quality, displacementField, depthMotion }: Str
       fragmentShader: streamParticleFragmentShader,
     })
     return { simulation, geometry, material, projection: new Matrix4() }
-  }, [depthMotion, displacementField, height, quality, width])
+  }, [budget.streamParticles, depthMotion, displacementField, height, quality, width])
 
   useEffect(() => () => {
     geometry.dispose()

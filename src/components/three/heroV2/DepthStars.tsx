@@ -1,3 +1,4 @@
+import { usePerformanceProfile } from '../../performance/usePerformanceProfile'
 import { useFrame } from '@react-three/fiber'
 import { useEffect, useMemo, useRef } from 'react'
 import type { RefObject } from 'react'
@@ -7,11 +8,6 @@ import type { Points } from 'three'
 import type { WebGLQuality } from '../useWebGLPerformanceProfile'
 import { getFieldExtent, V2_CAMERA_Z } from './fieldSettings'
 
-const STAR_COUNTS: Record<WebGLQuality, number> = {
-  full: 1100,
-  constrained: 380,
-  reduced: 120,
-}
 const STAR_DEPTHS = [-14, -6, -1.7] as const
 
 // Reuse the deterministic star distribution approach from the earlier Hero.
@@ -77,9 +73,10 @@ interface DepthStarsProps {
 }
 
 export function DepthStars({ aspect, quality, motion, animate }: DepthStarsProps) {
+  const { budget } = usePerformanceProfile()
   const pointsRef = useRef<Points<BufferGeometry, ShaderMaterial>>(null)
   const resources = useMemo(() => {
-    const count = STAR_COUNTS[quality]
+    const count = budget.heroStars
     const positions = new Float32Array(count * 3)
     const colors = new Float32Array(count * 3)
     const sizes = new Float32Array(count)
@@ -132,7 +129,7 @@ export function DepthStars({ aspect, quality, motion, animate }: DepthStarsProps
       fragmentShader: starFragmentShader,
     })
     return { geometry, material }
-  }, [aspect, quality])
+  }, [aspect, quality, budget.heroStars])
 
   useEffect(() => () => {
     resources.geometry.dispose()

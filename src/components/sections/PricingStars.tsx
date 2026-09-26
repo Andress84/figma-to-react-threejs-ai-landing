@@ -1,3 +1,4 @@
+import { usePerformanceProfile } from '../performance/usePerformanceProfile'
 import { useEffect, useRef } from 'react'
 import type { CSSProperties, RefObject } from 'react'
 
@@ -24,11 +25,6 @@ const LAYERS: { depth: Depth; count: number; minSize: number; maxSize: number }[
   { depth: 'mid', count: 50, minSize: 1, maxSize: 1.7 },
   { depth: 'near', count: 26, minSize: 1.4, maxSize: 2.3 },
 ]
-const PROFILE_COUNTS: Record<WebGLQuality, number[]> = {
-  full: [58, 50, 26],
-  constrained: [34, 24, 8],
-  reduced: [24, 8, 0],
-}
 
 // Use the same seeded warm/cool/neutral star family as the section above.
 function mulberry32(seed: number) {
@@ -79,6 +75,7 @@ interface PricingStarsProps {
 }
 
 export function PricingStars({ fieldRef, quality, visible }: PricingStarsProps) {
+  const { budget } = usePerformanceProfile()
   const starsRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -139,11 +136,11 @@ export function PricingStars({ fieldRef, quality, visible }: PricingStarsProps) 
   }, [fieldRef, quality, visible])
 
   return (
-    <div ref={starsRef} className={styles.pricingStars} data-pricing-stars data-visible={visible}>
+    <div ref={starsRef} className={styles.pricingStars} data-pricing-stars data-ambient-active={visible} data-visible={visible}>
       {layers.map(({ depth, stars }, layerIndex) => (
         <div key={depth} className={starStyles.layer}>
           <div className={starStyles.pointerLayer} data-pricing-star-layer={depth}>
-            {stars.slice(0, PROFILE_COUNTS[quality][layerIndex]).map((star, index) => (
+            {stars.slice(0, budget.pricingStars[layerIndex]).map((star, index) => (
               <span key={index} className={starStyles.star} data-depth={depth} data-tone={star.tone}
                 style={{
                   '--star-x': star.x,

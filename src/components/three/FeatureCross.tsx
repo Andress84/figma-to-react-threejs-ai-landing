@@ -1,3 +1,5 @@
+import { DecorativeBoundary } from '../performance/DecorativeBoundary'
+import { usePerformanceProfile, useSceneActivity } from '../performance/usePerformanceProfile'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { useEffect, useMemo, useRef } from 'react'
 import type { PointerEvent, RefObject } from 'react'
@@ -14,11 +16,14 @@ export interface FeatureCrossMotion {
 interface CrossShapeProps {
   motionRef: RefObject<FeatureCrossMotion>
   pointerRef: RefObject<Vector2>
+  active: boolean
+  onFailure: () => void
 }
 
-function CrossShape({ motionRef, pointerRef }: CrossShapeProps) {
+function CrossShape({ motionRef, pointerRef, active, onFailure }: CrossShapeProps) {
   const groupRef = useRef<Group>(null)
   const dampedPointer = useRef(new Vector2())
+  const gl = useThree(state => state.gl)
   const invalidate = useThree((state) => state.invalidate)
   const resources = useMemo(() => {
     const boxes = [
@@ -35,15 +40,28 @@ function CrossShape({ motionRef, pointerRef }: CrossShapeProps) {
 
   useEffect(() => {
     const motion = motionRef.current
-    motion.invalidate = invalidate
+    motion.invalidate = active ? invalidate : () => {}
     invalidate()
     return () => {
       motion.invalidate = () => {}
+    }
+  }, [active, invalidate, motionRef])
+
+  useEffect(() => {
+    const lost = (event: Event) => { event.preventDefault(); onFailure() }
+    gl.domElement.addEventListener('webglcontextlost', lost)
+    return () => {
+      gl.domElement.removeEventListener('webglcontextlost', lost)
+    }
+  }, [gl, onFailure])
+
+  useEffect(() => {
+    return () => {
       resources.boxes.forEach((box) => box.dispose())
       resources.edges.forEach((edge) => edge.dispose())
       resources.material.dispose()
     }
-  }, [invalidate, motionRef, resources])
+  }, [resources])
 
   useFrame((_, delta) => {
     const group = groupRef.current
@@ -59,7 +77,7 @@ function CrossShape({ motionRef, pointerRef }: CrossShapeProps) {
       -0.3 + progress * 2.35 + pointer.x * 0.06,
       0.12 + progress * 0.28,
     )
-    if (pointer.distanceToSquared(target) > 0.0001) invalidate()
+    if (active && pointer.distanceToSquared(target) > 0.0001) invalidate()
   })
 
   return (
@@ -77,6 +95,9 @@ export default function FeatureCross({ motionRef, interactive }: {
   interactive: boolean
 }) {
   const pointerRef = useRef(new Vector2())
+  const targetRef = useRef<HTMLDivElement>(null)
+  const { active } = useSceneActivity(targetRef)
+  const profile = usePerformanceProfile()
 
   function handlePointerMove(event: PointerEvent<HTMLDivElement>) {
     if (!interactive || event.pointerType !== 'mouse') return
@@ -94,10 +115,10 @@ export default function FeatureCross({ motionRef, interactive }: {
   }
 
   return (
-    <div className={styles.crossCanvas} onPointerMove={handlePointerMove}
+    <div ref={targetRef} className={styles.crossCanvas} onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave} aria-hidden="true">
-      <Canvas camera={{ fov: 42, near: 0.1, far: 20, position: [0, 0, 3.35] }}
-        dpr={[1, 1.5]} frameloop="demand" role="presentation" tabIndex={-1}
+      <DecorativeBoundary fallback={<svg viewBox="0 0 180 150" focusable="false"><path fill="none" stroke="currentColor" d="m26 48 42-18 18 42-42 18z m36-26 42-18 18 42-42 18z m29 28 42-18 18 42-42 18z" /></svg>}>{fail => <Canvas camera={{ fov: 42, near: 0.1, far: 20, position: [0, 0, 3.35] }}
+        dpr={[1, Math.min(1.5, profile.budget.dpr)]} frameloop={active ? 'demand' : 'never'} role="presentation" tabIndex={-1}
         gl={{ alpha: true, antialias: true, powerPreference: 'low-power' }}
         fallback={<svg viewBox="0 0 180 150" focusable="false">
           <g fill="none" stroke="currentColor" strokeWidth="1.25">
@@ -107,8 +128,8 @@ export default function FeatureCross({ motionRef, interactive }: {
           </g>
         </svg>}
       >
-        <CrossShape motionRef={motionRef} pointerRef={pointerRef} />
-      </Canvas>
+        <CrossShape motionRef={motionRef} pointerRef={pointerRef} active={active} onFailure={fail} />
+      </Canvas>}</DecorativeBoundary>
     </div>
   )
 }

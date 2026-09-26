@@ -1,3 +1,4 @@
+import { usePerformanceProfile, useSceneActivity } from '../performance/usePerformanceProfile'
 import { useEffect, useRef } from 'react'
 import type { CSSProperties } from 'react'
 
@@ -71,11 +72,13 @@ const layers = LAYERS.map(({ depth, count, minSize, maxSize }) => ({
 
 export function SectionAtmosphere({ interactive }: { interactive: boolean }) {
   const fieldRef = useRef<HTMLDivElement>(null)
+  const { budget } = usePerformanceProfile()
+  const { active } = useSceneActivity(fieldRef)
 
   useEffect(() => {
     const field = fieldRef.current
     const passage = field?.parentElement
-    if (!interactive || !field || !passage
+    if (!active || !interactive || !field || !passage
       || !window.matchMedia('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)').matches) return
 
     const pointerLayers = Array.from(field.querySelectorAll<HTMLElement>('[data-section-pointer-layer]'))
@@ -134,15 +137,15 @@ export function SectionAtmosphere({ interactive }: { interactive: boolean }) {
       pointerLayers.forEach((layer) => { layer.style.removeProperty('transform') })
       haze?.style.removeProperty('transform')
     }
-  }, [interactive])
+  }, [active, interactive])
 
   return (
-    <div ref={fieldRef} className={styles.field} aria-hidden="true">
+    <div ref={fieldRef} className={styles.field} data-ambient-active={active} aria-hidden="true">
       <div className={styles.haze} data-section-haze />
-      {layers.map(({ depth, stars }) => (
+      {layers.map(({ depth, stars }, layerIndex) => (
         <div key={depth} className={styles.layer} data-section-star-layer={depth}>
           <div className={styles.pointerLayer} data-section-pointer-layer={depth}>
-            {stars.map((star, index) => (
+            {stars.slice(0, budget.sectionStars[layerIndex]).map((star, index) => (
               <span key={index} className={styles.star} data-depth={depth} data-tone={star.tone}
                 style={{
                   '--star-x': star.x,

@@ -1,3 +1,5 @@
+import { useRef } from 'react'
+import { usePerformanceProfile, useSceneActivity } from '../performance/usePerformanceProfile'
 import type { CSSProperties } from 'react'
 
 import type { WebGLQuality } from '../three/useWebGLPerformanceProfile'
@@ -24,11 +26,6 @@ const SPECS: { depth: Depth; count: number; minSize: number; maxSize: number }[]
   { depth: 'mid', count: 36, minSize: 1, maxSize: 1.75 },
   { depth: 'near', count: 16, minSize: 1.45, maxSize: 2.25 },
 ]
-const PROFILE_COUNTS: Record<WebGLQuality, number[]> = {
-  full: [48, 36, 16],
-  constrained: [28, 16, 4],
-  reduced: [18, 6, 0],
-}
 
 function mulberry32(seed: number) {
   let value = seed
@@ -70,13 +67,16 @@ const layers = SPECS.map(({ depth, count, minSize, maxSize }) => ({
 }))
 
 export function FaqAtmosphere({ quality }: { quality: WebGLQuality }) {
+  const fieldRef = useRef<HTMLDivElement>(null)
+  const { budget } = usePerformanceProfile()
+  const { active } = useSceneActivity(fieldRef)
   return (
-    <div className={styles.atmosphere} data-quality={quality} aria-hidden="true">
+    <div ref={fieldRef} data-ambient-active={active} className={styles.atmosphere} data-quality={quality} aria-hidden="true">
       <div className={styles.haze} />
       {layers.map(({ depth, stars }, layerIndex) => (
         <div key={depth} className={starStyles.layer}>
           <div className={starStyles.pointerLayer} data-faq-star-layer={depth}>
-            {stars.slice(0, PROFILE_COUNTS[quality][layerIndex]).map((star, index) => (
+            {stars.slice(0, budget.faqStars[layerIndex]).map((star, index) => (
               <span
                 key={index}
                 className={starStyles.star}

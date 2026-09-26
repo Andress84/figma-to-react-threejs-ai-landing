@@ -1,3 +1,4 @@
+import type { CursorBudget } from '../performance/performancePolicy'
 import { CursorForegroundMask } from './CursorForegroundMask'
 import { fragments, vertexShader } from './cursorFluidShaders'
 import styles from './GlobalCursor.module.css'
@@ -36,9 +37,11 @@ export class CursorFluid {
   private elapsed = 0
   private lost = false
   private disposed = false
-  private light = navigator.hardwareConcurrency <= 4
+  private budget: CursorBudget
+  private renderFrames = 0
 
-  constructor() {
+  constructor(budget: CursorBudget) {
+    this.budget = budget
     const gl = this.canvas.getContext('webgl2', {
       alpha: true, antialias: false, depth: false, stencil: false,
       premultipliedAlpha: false, preserveDrawingBuffer: false,
@@ -168,13 +171,20 @@ export class CursorFluid {
 
   private draw() { this.gl.drawArrays(this.gl.TRIANGLES, 0, 3) }
 
-  resize() {
+  setBudget(budget: CursorBudget) {
+    if (this.budget === budget) return
+    this.budget = budget
+    this.resize(true)
+  }
+
+  resize(force = false) {
     if (this.lost || this.disposed) return
+    if (!force && this.width === document.documentElement.clientWidth && this.height === window.innerHeight) return
     this.width = document.documentElement.clientWidth
     this.height = window.innerHeight
     const aspect = this.width / this.height
-    const short = this.light ? 112 : 160
-    const dyeShort = this.light ? 320 : 512
+    const short = this.budget.simulation
+    const dyeShort = this.budget.dye
     const dimensions = (base: number) => aspect >= 1
       ? [Math.round(base * aspect), base] : [base, Math.round(base / aspect)]
     const [sw, sh] = dimensions(short)
@@ -189,7 +199,7 @@ export class CursorFluid {
     this.curl = this.createTarget(sw, sh)
     this.divergence = this.createTarget(sw, sh)
     // Output never scales with hardware DPR. Simulation stays smaller still.
-    const scale = Math.min(1, (this.light ? 900 : 1280) / Math.max(this.width, this.height))
+    const scale = Math.min(1, this.budget.output / Math.max(this.width, this.height))
     this.canvas.width = Math.round(this.width * scale)
     this.canvas.height = Math.round(this.height * scale)
     this.canvas.style.width = `${this.width}px`
@@ -287,7 +297,7 @@ export class CursorFluid {
     this.draw()
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.pressure.read.buffer)
     gl.clear(gl.COLOR_BUFFER_BIT)
-    for (let i = 0; i < (this.light ? 6 : 10); i++) {
+    for (let i = 0; i < this.budget.pressure; i++) {
       pass = this.use('pressure', this.pressure.write, this.pressure.read)
       this.texture(pass, 'divergence', this.divergence, 1)
       this.draw()
@@ -326,6 +336,11 @@ export class CursorFluid {
     gl.uniform1i(this.uniform(pass, 'foreground'), 4)
     this.draw()
     this.canvas.style.visibility = 'visible'
+    if (import.meta.env.DEV) {
+      this.canvas.dataset.renderFrames = String(++this.renderFrames)
+      this.canvas.dataset.simulation = `${this.velocity.read.width}x${this.velocity.read.height}`
+      this.canvas.dataset.pressureIterations = String(this.budget.pressure)
+    }
     return true
   }
 

@@ -1,4 +1,5 @@
-import { lazy, Suspense, useSyncExternalStore } from 'react'
+import { useSceneActivity } from '../performance/usePerformanceProfile'
+import { lazy, Suspense, useRef, useSyncExternalStore } from 'react'
 import type { RefObject } from 'react'
 
 import { features } from '../../data/features'
@@ -24,9 +25,11 @@ export function FeaturesSection({ motionRef, interactive }: {
   motionRef: RefObject<FeatureCrossMotion>
   interactive: boolean
 }) {
+  const sectionRef = useRef<HTMLElement>(null)
+  const { loaded } = useSceneActivity(sectionRef)
   const showCross = useSyncExternalStore(subscribeToWideScreen, getWideScreen, () => false)
   return (
-    <section
+    <section ref={sectionRef}
       id="product"
       className={styles.section}
       aria-labelledby="features-heading"
@@ -48,7 +51,7 @@ export function FeaturesSection({ motionRef, interactive }: {
           </header>
 
           <div className={styles.artwork} aria-hidden="true" data-scroll-cross>
-            {showCross && <Suspense fallback={<svg viewBox="0 0 180 150" focusable="false">
+            {showCross && loaded && <Suspense fallback={<svg viewBox="0 0 180 150" focusable="false">
               <g fill="none" stroke="currentColor" strokeWidth="1.25">
                 <path d="m26 48 42-18 18 42-42 18z" />
                 <path d="m62 22 42-18 18 42-42 18z" />

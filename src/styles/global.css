@@ -50,3 +50,12 @@ body {
         scroll-behavior: auto;
     }
 }
+
+/* Retain each atmosphere's animation phase while outside the viewport/covered. */
+[data-ambient-active='false'] *,
+html[data-background-active='false'] [data-ambient-active] * {
+  animation-play-state: paused !important;
+}
+html[data-motion='reduced'] [data-ambient-active] * {
+  animation: none !important;
+}

@@ -14,13 +14,14 @@ import { V2_CAMERA_Z, V2_MOTION } from './fieldSettings'
 
 interface HeroSceneV2Props {
   pointerTargetRef: RefObject<HTMLElement | null>
+  active: boolean
   profile: WebGLPerformanceProfile
 }
 
-export function HeroSceneV2({ pointerTargetRef, profile }: HeroSceneV2Props) {
-  const enabled = profile.quality === 'full'
+export function HeroSceneV2({ pointerTargetRef, profile, active }: HeroSceneV2Props) {
+  const enabled = profile.quality === 'full' && active
   const pointer = useHeroPointer(pointerTargetRef, enabled)
-  const field = useHeroDisplacementField(pointer, enabled)
+  const field = useHeroDisplacementField(pointer, profile.quality === 'full')
   const group = useRef<Group>(null)
   const motionRef = useRef(new Vector2())
   const aspect = useThree((state) => state.size.width / Math.max(1, state.size.height))

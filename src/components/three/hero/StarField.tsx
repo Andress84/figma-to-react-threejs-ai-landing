@@ -1,3 +1,4 @@
+import { usePerformanceProfile } from '../../performance/usePerformanceProfile'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useEffect, useMemo, useRef } from 'react'
 import {
@@ -71,25 +72,14 @@ function mulberry32(seed: number) {
   }
 }
 
-function getParticleCount(quality: WebGLQuality) {
-  if (quality === 'full') {
-    return 440
-  }
-
-  if (quality === 'constrained') {
-    return 160
-  }
-
-  return 72
-}
-
 export function StarField({ animate, depthMotion, quality }: StarFieldProps) {
+  const { budget } = usePerformanceProfile()
   const pointsRef = useRef<Points<BufferGeometry, ShaderMaterial>>(null)
   const { height, width } = useThree((state) => state.viewport)
   const pixelRatio = useThree((state) => state.gl.getPixelRatio())
   const { geometry, material } = useMemo(() => {
     const random = mulberry32(92821)
-    const count = getParticleCount(quality)
+    const count = budget.v1Stars
     const positions = new Float32Array(count * 3)
     const colors = new Float32Array(count * 3)
     const sizes = new Float32Array(count)
@@ -144,7 +134,7 @@ export function StarField({ animate, depthMotion, quality }: StarFieldProps) {
     })
 
     return { geometry: nextGeometry, material: nextMaterial }
-  }, [depthMotion, height, pixelRatio, quality, width])
+  }, [budget.v1Stars, depthMotion, height, pixelRatio, quality, width])
 
   useEffect(
     () => () => {

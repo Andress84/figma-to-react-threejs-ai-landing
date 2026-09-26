@@ -1,3 +1,4 @@
+import { forceWebGLFallback, getPerformanceSnapshot, subscribePerformance } from '../performance/performanceStore'
 import { useEffect, useRef } from 'react'
 
 import { gsap } from '../../hooks/useGsap'
@@ -30,7 +31,11 @@ export function GlobalCursor() {
     if (!indicator || !dot || !halo) return
 
     const query = window.matchMedia(CURSOR_QUERY)
-    let enabled = query.matches
+    let profile = getPerformanceSnapshot()
+    let enabled = query.matches && profile.pointerEnabled
+    let fluidElapsed = 0
+    let fluidSchedule = 0
+    let fluidEvolving = false
     let disposed = false
     let loading = false
     let unavailable = false
@@ -76,8 +81,17 @@ export function GlobalCursor() {
       halo.style.opacity = String(hoverAmount * 0.78)
       halo.style.transform = `scale(${(0.13 + hoverAmount * 0.87).toFixed(3)})`
 
-      let evolving = false
-      try { evolving = fluid?.update(dt) ?? false } catch { disableFluid() }
+      if (profile.backgroundActive) {
+        fluidElapsed += dt
+        fluidSchedule += dt
+      }
+      const interval = profile.budget.cursor.fps ? 1 / profile.budget.cursor.fps : 0
+      if (profile.backgroundActive && (!interval || fluidSchedule + 0.001 >= interval)) {
+        try { fluidEvolving = fluid?.update(Math.min(fluidElapsed, 0.05)) ?? false } catch { disableFluid() }
+        fluidElapsed = 0
+        fluidSchedule = interval ? Math.max(0, fluidSchedule - interval) : 0
+      }
+      const evolving = profile.backgroundActive && fluidEvolving
       if (
         !evolving && performance.now() - lastMoveAt > 1000 &&
         Math.abs(hoverAmount - hoverTarget) < 0.008 &&
@@ -95,12 +109,12 @@ export function GlobalCursor() {
     }
 
     const ensureFluid = () => {
-      if (fluid || loading || unavailable || !enabled) return
+      if (fluid || loading || unavailable || !enabled || !profile.backgroundActive || forceWebGLFallback) return
       loading = true
       // No WebGL allocation or shader download on coarse/reduced-motion devices.
       void import('./CursorFluid').then(({ CursorFluid: Fluid }) => {
-        if (disposed || !enabled || document.hidden) return
-        fluid = new Fluid()
+        if (disposed || !enabled || !profile.backgroundActive) return
+        fluid = new Fluid(profile.budget.cursor)
         indicator.dataset.fluid = 'ready'
         start()
       }).catch(() => {
@@ -147,7 +161,7 @@ export function GlobalCursor() {
         indicator.dataset.visible = 'true'
         document.documentElement.dataset.customCursor = 'active'
       } else {
-        fluid?.addMovement(lastX, lastY, event.clientX, event.clientY, now - lastMoveAt)
+        if (profile.backgroundActive) fluid?.addMovement(lastX, lastY, event.clientX, event.clientY, now - lastMoveAt)
       }
       pointerX = lastX = event.clientX
       pointerY = lastY = event.clientY
@@ -166,7 +180,7 @@ export function GlobalCursor() {
       try { fluid?.resize() } catch { disableFluid() }
     }
     const mediaChange = () => {
-      enabled = query.matches
+      enabled = query.matches && profile.pointerEnabled
       if (!enabled) {
         suspend()
         fluid?.dispose()
@@ -176,6 +190,18 @@ export function GlobalCursor() {
     }
     const visibility = () => { if (document.hidden) suspend() }
 
+    const unsubscribeProfile = subscribePerformance(() => {
+      const previous = profile
+      profile = getPerformanceSnapshot()
+      mediaChange()
+      if (!profile.backgroundActive && previous.backgroundActive) {
+        fluid?.reset()
+        fluidElapsed = 0
+        fluidSchedule = 0
+        fluidEvolving = false
+      }
+      try { fluid?.setBudget(profile.budget.cursor) } catch { disableFluid() }
+    })
     query.addEventListener('change', mediaChange)
     window.addEventListener('pointermove', move, { passive: true })
     document.documentElement.addEventListener('pointerleave', hideIndicator)
@@ -187,6 +213,7 @@ export function GlobalCursor() {
 
     return () => {
       disposed = true
+      unsubscribeProfile()
       suspend()
       fluid?.dispose()
       query.removeEventListener('change', mediaChange)

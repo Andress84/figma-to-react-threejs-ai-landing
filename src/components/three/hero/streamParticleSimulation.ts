@@ -67,9 +67,9 @@ export class StreamParticleSimulation {
   private readonly disturbance = new Vector4()
   private time = 0
 
-  constructor(quality: WebGLQuality, width: number, height: number) {
-    this.count = quality === 'full' ? STREAM_PARTICLE_TUNING.fullCount
-      : quality === 'constrained' ? STREAM_PARTICLE_TUNING.constrainedCount : 0
+  constructor(quality: WebGLQuality, width: number, height: number, count?: number) {
+    this.count = count ?? (quality === 'full' ? STREAM_PARTICLE_TUNING.fullCount
+      : quality === 'constrained' ? STREAM_PARTICLE_TUNING.constrainedCount : 0)
     this.positions = new Float32Array(this.count * 3)
     this.offsets = new Float32Array(this.count * 2)
     this.colors = new Float32Array(this.count * 3)

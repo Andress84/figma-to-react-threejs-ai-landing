@@ -18,6 +18,7 @@ export { HERO_CAMERA_NEUTRAL_Z } from './useHeroDepthMotion'
 
 interface HeroSceneProps {
   pointerTargetRef: RefObject<HTMLElement | null>
+  active: boolean
   profile: WebGLPerformanceProfile
 }
 
@@ -81,10 +82,10 @@ function CameraRig({
   return null
 }
 
-export function HeroScene({ pointerTargetRef, profile }: HeroSceneProps) {
-  const pointerEnabled = profile.quality === 'full'
+export function HeroScene({ pointerTargetRef, profile, active }: HeroSceneProps) {
+  const pointerEnabled = profile.quality === 'full' && active
   const pointerRef = useHeroPointer(pointerTargetRef, pointerEnabled)
-  const displacementField = useHeroDisplacementField(pointerRef, pointerEnabled)
+  const displacementField = useHeroDisplacementField(pointerRef, profile.quality === 'full')
   const depthMotion = useHeroDepthMotion(pointerRef, pointerEnabled)
   const ambientGroupRef = useRef<Group>(null)
   const ribbonsGroupRef = useRef<Group>(null)
