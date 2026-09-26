@@ -354,6 +354,13 @@
     }
 }
 
+/* Full-HD laptops and other wide but relatively short desktop viewports. */
+@media (min-width: 75rem) and (max-height: 64rem) {
+        .navLink {
+            font-size: 1.25rem;
+        }
+}
+
 @media (hover: hover) {
     .navLink:hover,
     .mobileNavLink:hover {

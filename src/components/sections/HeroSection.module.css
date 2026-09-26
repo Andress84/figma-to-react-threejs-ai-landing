@@ -272,6 +272,17 @@
     }
 }
 
+/* Keep the Hero comfortably framed on Full-HD laptop viewports. */
+@media (min-width: 75rem) and (max-height: 64rem) {
+        .heading {
+            font-size: clamp(4rem, 4.4vw, 4.25rem);
+        }
+
+        .description {
+            margin-top: var(--space-8);
+        }
+}
+
 @media (forced-colors: active) {
     .accent {
         background: none;

@@ -128,7 +128,17 @@ export function AIFormation({ pointerTargetRef, field, animate }: AIFormationPro
       const gap = Math.max(0, title.top - top)
       const height = Math.min(MAX_HEIGHT, title.width * 0.45, bounds.width * 0.3,
         Math.max(110, gap * 1.38))
-      const centerY = title.top + height * (proofBounds?.height ? 0.2 : -0.14)
+      const compactLaptop = window.matchMedia(
+          '(min-width: 75rem) and (max-width: 120rem) and (max-height: 64rem)',
+      ).matches
+
+      const centerY = title.top + height * (
+          proofBounds?.height
+              ? 0.2
+              : compactLaptop
+                  ? 0.02
+                  : -0.14
+      )
       const descriptionTop = description?.getBoundingClientRect().top ?? title.bottom + 28
       const unitsPerPixel = 2 * Math.tan(V2_FOV * Math.PI / 360)
         * (V2_CAMERA_Z - FORMATION_Z) / Math.max(1, bounds.height)
